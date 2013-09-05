@@ -48,7 +48,7 @@
 	<scm>
 		<url>https://github.com/divinespear/jpa-schema-maven-plugin</url>
 		<connection>scm:git:https://github.com/divinespear/jpa-schema-maven-plugin.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com:divinespear/jpa-schema-maven-plugin.git</developerConnection>
+		<developerConnection>scm:git:git@github.com:divinespear/jpa-schema-maven-plugin.git</developerConnection>
 	</scm>
 
 	<issueManagement>
