@@ -147,9 +147,273 @@
       </ul>
       
 <div class="section">
-<h3>Parameters<a name="Parameters"></a></h3>
+<h3>Optional Parameters<a name="Optional_Parameters"></a></h3>
         
-<p>(no parameters)</p>
+<table class="table table-striped" border="0">
+          
+<tr class="a">
+            
+<th>Name</th>
+            
+<th>Type</th>
+            
+<th>Since</th>
+            
+<th>Description</th>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#createOutputFileName">createOutputFileName</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>generated create script name<br /><b>Default value is</b>: <tt>create.sql</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#dropOutputFileName">dropOutputFileName</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>generated drop script name<br /><b>Default value is</b>: <tt>drop.sql</tt>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#implementation">implementation</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>JPA implementation 
+
+<p>support value is <tt>eclipselink</tt> or
+<tt>hibernate</tt>, as case-insensitive.</p><br /><b>Default value is</b>: <tt>eclipselink</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#jpaVersion">jpaVersion</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>JPA version 
+
+<p>support value is <tt>2.0</tt> or <tt>2.1</tt>.</p>
+
+<p>Note for JPA 2.1, version of implementation must be:</p>
+
+<ul>
+
+<li>EclipseLink: 2.5.0 or newer</li>
+
+<li>Hibernate: 4.3.0 or newer</li>
+</ul><br /><b>Default value is</b>: <tt>2.1</tt>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#mode">mode</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>schema generation mode 
+
+<p>support value is <tt>create</tt>, <tt>drop</tt>, or
+<tt>drop-and-create</tt>.</p><br /><b>Default value is</b>: <tt>drop-and-create</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#outputDirectory">outputDirectory</a></b></td>
+            
+<td><tt>File</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>output directory for generated ddl scripts<br /><b>Default value is</b>: <tt>${project.build.directory}/generated-schema</tt>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#persistenceUnitName">persistenceUnitName</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>unit name of <tt>persistence.xml</tt><br /><b>Default value is</b>: <tt>default</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#persistenceXml">persistenceXml</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>location of <tt>persistence.xml</tt> file<br /><b>Default value is</b>: <tt>META-INF/persistence.xml</tt>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#target">target</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>schema generation target 
+
+<p>support value is <tt>database</tt>, <tt>script</tt>, or
+<tt>both</tt>.</p><br /><b>Default value is</b>: <tt>both</tt>.<br /></td>
+          </tr>
+        </table>
+      </div>
+      
+<div class="section">
+<h3>Parameter Details<a name="Parameter_Details"></a></h3>
+        
+<p><b><a name="createOutputFileName">createOutputFileName</a>:</b></p>
+        
+<div>generated create script name</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>Default</b>: <tt>create.sql</tt></li>
+        </ul><hr />
+<p><b><a name="dropOutputFileName">dropOutputFileName</a>:</b></p>
+        
+<div>generated drop script name</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>Default</b>: <tt>drop.sql</tt></li>
+        </ul><hr />
+<p><b><a name="implementation">implementation</a>:</b></p>
+        
+<div>JPA implementation 
+
+<p>support value is <tt>eclipselink</tt> or
+<tt>hibernate</tt>, as case-insensitive.</p></div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>Default</b>: <tt>eclipselink</tt></li>
+        </ul><hr />
+<p><b><a name="jpaVersion">jpaVersion</a>:</b></p>
+        
+<div>JPA version 
+
+<p>support value is <tt>2.0</tt> or <tt>2.1</tt>.</p>
+
+<p>Note for JPA 2.1, version of implementation must be:</p>
+
+<ul>
+
+<li>EclipseLink: 2.5.0 or newer</li>
+
+<li>Hibernate: 4.3.0 or newer</li>
+</ul></div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>Default</b>: <tt>2.1</tt></li>
+        </ul><hr />
+<p><b><a name="mode">mode</a>:</b></p>
+        
+<div>schema generation mode 
+
+<p>support value is <tt>create</tt>, <tt>drop</tt>, or
+<tt>drop-and-create</tt>.</p></div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>Default</b>: <tt>drop-and-create</tt></li>
+        </ul><hr />
+<p><b><a name="outputDirectory">outputDirectory</a>:</b></p>
+        
+<div>output directory for generated ddl scripts</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.io.File</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>Default</b>: <tt>${project.build.directory}/generated-schema</tt></li>
+        </ul><hr />
+<p><b><a name="persistenceUnitName">persistenceUnitName</a>:</b></p>
+        
+<div>unit name of <tt>persistence.xml</tt></div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>Default</b>: <tt>default</tt></li>
+        </ul><hr />
+<p><b><a name="persistenceXml">persistenceXml</a>:</b></p>
+        
+<div>location of <tt>persistence.xml</tt> file</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>Default</b>: <tt>META-INF/persistence.xml</tt></li>
+        </ul><hr />
+<p><b><a name="target">target</a>:</b></p>
+        
+<div>schema generation target 
+
+<p>support value is <tt>database</tt>, <tt>script</tt>, or
+<tt>both</tt>.</p></div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>Default</b>: <tt>both</tt></li>
+        </ul>
       </div>
     </div>
   
