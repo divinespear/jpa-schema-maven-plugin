@@ -1,5 +1,5 @@
 language: java
-script: "mvn clean deploy -Dmaven.install.skip=true"
+script: "mvn deploy -Dmaven.install.skip=true --settings target/META-INF/travis-ci/settings.xml"
 jdk:
   - openjdk6
 env:
