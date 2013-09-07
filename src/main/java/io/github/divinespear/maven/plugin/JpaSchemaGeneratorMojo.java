@@ -183,12 +183,74 @@ public class JpaSchemaGeneratorMojo
     }
 
     /**
+     * specifies whether the creation of database artifacts is to occur on the basis of the object/relational mapping
+     * metadata, DDL script, or a combination of the two.
+     * <p>
+     * support value is <code>metadata</code>, <code>script</code>, <code>metadata-then-script</code>, or
+     * <code>script-then-metadata</code>.
+     * <p>
+     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode.
+     * 
+     * @since JPA 2.1
+     */
+    @Parameter(defaultValue = "metadata")
+    private String createSourceMode;
+
+    public String getCreateSourceMode() {
+        return createSourceMode;
+    }
+
+    /**
+     * create source file path.
+     * <p>
+     * this is REQUIRED if you pick {@link #createSourceMode} as <code>script</code>, <code>metadata-then-script</code>,
+     * or <code>script-then-metadata</code>.
+     * <p>
+     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode.
+     * 
+     * @since JPA 2.1
+     */
+    @Parameter
+    private File createSourceFile;
+
+    public File getCreateSourceFile() {
+        return createSourceFile;
+    }
+
+    /**
+     * specifies whether the dropping of database artifacts is to occur on the basis of the object/relational mapping
+     * metadata, DDL script, or a combination of the two.
+     * <p>
+     * support value is <code>metadata</code>, <code>script</code>, <code>metadata-then-script</code>, or
+     * <code>script-then-metadata</code>.
+     * <p>
+     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode.
+     * 
+     * @since JPA 2.1
+     */
+    @Parameter(defaultValue = "metadata")
+    private String dropSourceMode;
+
+    /**
+     * drop source file path.
+     * <p>
+     * this is REQUIRED if you pick {@link #dropSourceMode} as <code>script</code>, <code>metadata-then-script</code>,
+     * or <code>script-then-metadata</code>.
+     * <p>
+     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode.
+     * 
+     * @since JPA 2.1
+     */
+    @Parameter
+    private File dropSourceFile;
+
+    /**
      * jdbc driver class name
      * <p>
      * default is declared class name in persistence xml.
      * <p>
-     * and remember, <strike><a href="http://callofduty.wikia.com/wiki/No_Russian" target="_blank">No
-     * Russian</a></strike> you MUST configure database driver dependency in your <code>pom.xml</code>.
+     * and Remember, <strike><a href="http://callofduty.wikia.com/wiki/No_Russian" target="_blank">No
+     * Russian</a></strike> you MUST configure jdbc driver as plugin's dependency.
      */
     @Parameter
     private String jdbcDriver;
@@ -243,7 +305,7 @@ public class JpaSchemaGeneratorMojo
      * <li>The value of this property should be the value returned for the target database by
      * {@link DatabaseMetaData#getDatabaseProductName()}</li>
      * </ul>
-     * Note you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
+     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
      * 
      * @since JPA 2.1
      */
@@ -262,7 +324,7 @@ public class JpaSchemaGeneratorMojo
      * <li>The value of this property should be the value returned for the target database by
      * {@link DatabaseMetaData#getDatabaseMajorVersion()}</li>
      * </ul>
-     * Note you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
+     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
      * 
      * @since JPA 2.1
      */
@@ -281,7 +343,7 @@ public class JpaSchemaGeneratorMojo
      * <li>The value of this property should be the value returned for the target database by
      * {@link DatabaseMetaData#getDatabaseMinorVersion()}</li>
      * </ul>
-     * Note you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
+     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
      * 
      * @since JPA 2.1
      */
