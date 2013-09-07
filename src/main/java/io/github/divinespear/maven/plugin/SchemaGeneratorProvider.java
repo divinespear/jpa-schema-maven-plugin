@@ -5,5 +5,5 @@ interface SchemaGeneratorProvider {
     String providerName();
 
     void execute(ClassLoader classLoader,
-                 JpaSchemaGeneratorMojo mojo);
+                 JpaSchemaGeneratorMojo mojo) throws Exception;
 }

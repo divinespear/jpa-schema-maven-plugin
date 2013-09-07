@@ -260,10 +260,10 @@ public class JpaSchemaGeneratorMojo
      * </ul>
      */
     @Parameter
-    private int databaseMajorVersion;
+    private Integer databaseMajorVersion;
 
-    public int getDatabaseMajorVersion() {
-        return databaseMajorVersion;
+    public String getDatabaseMajorVersion() {
+        return databaseMajorVersion == null ? null : String.valueOf(databaseMajorVersion);
     }
 
     /**
@@ -276,10 +276,10 @@ public class JpaSchemaGeneratorMojo
      * </ul>
      */
     @Parameter
-    private int databaseMinorVersion;
+    private Integer databaseMinorVersion;
 
-    public int getDatabaseMinorVersion() {
-        return databaseMinorVersion;
+    public String getDatabaseMinorVersion() {
+        return databaseMinorVersion == null ? null : String.valueOf(databaseMinorVersion);
     }
 
     @Override
@@ -298,6 +298,15 @@ public class JpaSchemaGeneratorMojo
         log.info("* Output Directory      : " + this.outputDirectory);
         log.info("  - Create Script Name  : " + this.createOutputFileName);
         log.info("  - Drop Script Name    : " + this.dropOutputFileName);
+        log.info("");
+        log.info("* Options");
+        log.info("  - DatabaseProductName  : " + this.databaseProductName);
+        log.info("  - DatabaseMajorVersion : " + this.databaseMajorVersion);
+        log.info("  - databaseMinorVersion : " + this.databaseMinorVersion);
+        log.info("  - JDBC Driver          : " + this.jdbcDriver);
+        log.info("  - JDBC URL             : " + this.jdbcUrl);
+        log.info("  - JDBC Username        : " + this.jdbcUser);
+        log.info("  - JDBC Password        : " + this.jdbcPassword);
 
         if (!this.outputDirectory.exists()) {
             this.outputDirectory.mkdirs();
@@ -308,7 +317,11 @@ public class JpaSchemaGeneratorMojo
         final SchemaGeneratorProvider provider = PROVIDER_MAP.get(providerId);
         log.info("* Selected provider     : " + providerId + "(" + provider.getClass().toString() + ")");
 
-        PROVIDER_MAP.get(providerId).execute(classLoader, this);
+        try {
+            PROVIDER_MAP.get(providerId).execute(classLoader, this);
+        } catch (Exception e) {
+            throw new MojoExecutionException("Error while running", e);
+        }
     }
 
     private ClassLoader getProjectClassLoader() throws MojoExecutionException {
