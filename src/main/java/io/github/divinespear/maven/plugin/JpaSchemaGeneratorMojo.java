@@ -322,7 +322,7 @@ public class JpaSchemaGeneratorMojo
         if (StringUtils.isNotBlank(this.jdbcDriver)) {
             try {
                 Driver driver = (Driver) classLoader.loadClass(this.jdbcDriver).newInstance();
-                DriverManager.registerDriver(new DelegatingDriver(driver));
+                DriverManager.registerDriver(driver);
             } catch (Exception e) {
                 throw new MojoExecutionException("Dependency for driver-class " + this.jdbcDriver + " is missing!", e);
             }
