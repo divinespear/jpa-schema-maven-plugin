@@ -23,12 +23,17 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.DatabaseMetaData;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -42,6 +47,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Generate database schema or DDL scripts.
@@ -223,9 +229,7 @@ public class JpaSchemaGeneratorMojo
      * <p>
      * default is declared password in persistence xml.
      * <p>
-     * Note for local file-based database (like Derby, H2, etc...): if you config database connection with
-     * <code>&lt;configuration&gt;</code>, then MUST use <code>&lt;databasePassword&gt;&lt;/databasePassword&gt;</code>
-     * for empty password.
+     * If your account has no password (especially local file-base, like Apache Derby, H2, etc...), it can be omitted.
      */
     @Parameter
     private String jdbcPassword;
@@ -313,6 +317,17 @@ public class JpaSchemaGeneratorMojo
         }
 
         final ClassLoader classLoader = this.getProjectClassLoader();
+        // driver load hack
+        // http://stackoverflow.com/questions/288828/how-to-use-a-jdbc-driver-from-an-arbitrary-location
+        if (StringUtils.isNotBlank(this.jdbcDriver)) {
+            try {
+                Driver driver = (Driver) classLoader.loadClass(this.jdbcDriver).newInstance();
+                DriverManager.registerDriver(new DelegatingDriver(driver));
+            } catch (Exception e) {
+                throw new MojoExecutionException("Dependency for driver-class " + this.jdbcDriver + " is missing!", e);
+            }
+        }
+
         final String providerId = (this.implementation.toLowerCase() + "_" + this.jpaVersion.toLowerCase()).trim();
         final SchemaGeneratorProvider provider = PROVIDER_MAP.get(providerId);
         log.info("* Selected provider     : " + providerId + "(" + provider.getClass().toString() + ")");
@@ -326,22 +341,37 @@ public class JpaSchemaGeneratorMojo
 
     private ClassLoader getProjectClassLoader() throws MojoExecutionException {
         try {
+            // compiled classes
             List<String> classfiles = this.project.getCompileClasspathElements();
             if (this.scanTestClasses) {
                 classfiles.addAll(this.project.getTestClasspathElements());
             }
-            List<URL> classURL = new ArrayList<URL>(classfiles.size());
+            // artifact dependency cache for "runtime" scope
+            synchronized (RESOLVED_ARTIFACTS) {
+                for (Artifact artifact : this.project.getDependencyArtifacts()) {
+                    // TODO: maybe filter "provided" too
+                    if (!"test".equalsIgnoreCase(artifact.getScope()) && artifact.getFile() == null) {
+                        Artifact resolved = this.session.getLocalRepository().find(artifact);
+                        RESOLVED_ARTIFACTS.add(resolved.getFile().toString());
+                    }
+                }
+            }
+            classfiles.addAll(RESOLVED_ARTIFACTS);
+
+            List<URL> classURLs = new ArrayList<URL>(classfiles.size());
             log.debug("* Dependencies:");
             for (String classfile : classfiles) {
                 log.debug("  - " + classfile);
-                classURL.add(new File(classfile).toURI().toURL());
+                classURLs.add(new File(classfile).toURI().toURL());
             }
-            return new URLClassLoader(classURL.toArray(EMPTY_URLS), this.getClass().getClassLoader());
+            return new URLClassLoader(classURLs.toArray(EMPTY_URLS), this.getClass().getClassLoader());
         } catch (Exception e) {
             throw new MojoExecutionException("Error while creating classloader", e);
         }
     }
 
+    private static final URL[] EMPTY_URLS = new URL[0];
+    private static final Set<String> RESOLVED_ARTIFACTS = new HashSet<String>();
     private static final Map<String, SchemaGeneratorProvider> PROVIDER_MAP;
     static {
         Map<String, SchemaGeneratorProvider> map = new HashMap<String, SchemaGeneratorProvider>();
@@ -352,7 +382,6 @@ public class JpaSchemaGeneratorMojo
             throw new RuntimeException("exception while initialize", e);
         }
     }
-    private static final URL[] EMPTY_URLS = new URL[0];
 
     private static void registerProvider(Map<String, SchemaGeneratorProvider> map,
                                          Class<? extends SchemaGeneratorProvider> clazz) throws Exception {
