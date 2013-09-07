@@ -73,13 +73,13 @@ public class JpaSchemaGeneratorMojo
     /**
      * skip schema generation
      */
-    @Parameter(alias = "${jpa-schema.generate.skip}", required = true, defaultValue = "false")
+    @Parameter(property = "jpa-schema.generate.skip", required = true, defaultValue = "false")
     private boolean skip;
 
     /**
      * scan test classes
      */
-    @Parameter(alias = "${jpa-schema.generate.scan-test-classes}", required = true, defaultValue = "false")
+    @Parameter(property = "jpa-schema.generate.scan-test-classes", required = true, defaultValue = "false")
     private boolean scanTestClasses;
 
     /**
