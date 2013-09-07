@@ -230,6 +230,10 @@ public class JpaSchemaGeneratorMojo
      */
     @Parameter(defaultValue = "metadata")
     private String dropSourceMode;
+    
+    public String getDropSourceMode() {
+        return dropSourceMode;
+    }
 
     /**
      * drop source file path.
@@ -243,6 +247,10 @@ public class JpaSchemaGeneratorMojo
      */
     @Parameter
     private File dropSourceFile;
+    
+    public File getDropSourceFile() {
+        return dropSourceFile;
+    }
 
     /**
      * jdbc driver class name

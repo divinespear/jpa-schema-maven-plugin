@@ -76,6 +76,17 @@ class JPA21EclipseLinkProviderImpl
         map.put(PersistenceUnitProperties.SCHEMA_DATABASE_PRODUCT_NAME, mojo.getDatabaseProductName());
         map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MAJOR_VERSION, mojo.getDatabaseMajorVersion());
         map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MINOR_VERSION, mojo.getDatabaseMinorVersion());
+        // source selection
+        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SOURCE, mojo.getCreateSourceMode());
+        if (mojo.getCreateSourceFile() != null) {
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SCRIPT_SOURCE,
+                    mojo.getCreateSourceFile().toURI().toString());
+        }
+        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SOURCE, mojo.getDropSourceMode());
+        if (mojo.getDropSourceFile() != null) {
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SCRIPT_SOURCE,
+                    mojo.getCreateSourceFile().toURI().toString());
+        }
 
         Persistence.generateSchema(mojo.getPersistenceUnitName(), this.removeNullValuesFromMap(map));
     }
