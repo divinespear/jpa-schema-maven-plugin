@@ -178,24 +178,6 @@ public class JpaSchemaGeneratorMojo
         return dropOutputFileName;
     }
 
-    private static final Map<String, SchemaGeneratorProvider> PROVIDER_MAP;
-    static {
-        Map<String, SchemaGeneratorProvider> map = new HashMap<String, SchemaGeneratorProvider>();
-        try {
-            registerProvider(map, JPA21EclipseLinkProviderImpl.class);
-            PROVIDER_MAP = Collections.unmodifiableMap(map);
-        } catch (Exception e) {
-            throw new RuntimeException("exception while initialize", e);
-        }
-    }
-    private static final URL[] EMPTY_URLS = new URL[0];
-
-    private static void registerProvider(Map<String, SchemaGeneratorProvider> map,
-                                         Class<? extends SchemaGeneratorProvider> clazz) throws Exception {
-        SchemaGeneratorProvider provider = clazz.newInstance();
-        map.put(provider.providerName(), provider);
-    }
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (this.skip) {
@@ -241,5 +223,23 @@ public class JpaSchemaGeneratorMojo
         } catch (Exception e) {
             throw new MojoExecutionException("Error while creating classloader", e);
         }
+    }
+
+    private static final Map<String, SchemaGeneratorProvider> PROVIDER_MAP;
+    static {
+        Map<String, SchemaGeneratorProvider> map = new HashMap<String, SchemaGeneratorProvider>();
+        try {
+            registerProvider(map, JPA21EclipseLinkProviderImpl.class);
+            PROVIDER_MAP = Collections.unmodifiableMap(map);
+        } catch (Exception e) {
+            throw new RuntimeException("exception while initialize", e);
+        }
+    }
+    private static final URL[] EMPTY_URLS = new URL[0];
+
+    private static void registerProvider(Map<String, SchemaGeneratorProvider> map,
+                                         Class<? extends SchemaGeneratorProvider> clazz) throws Exception {
+        SchemaGeneratorProvider provider = clazz.newInstance();
+        map.put(provider.providerName(), provider);
     }
 }
