@@ -78,12 +78,22 @@ class JPA21EclipseLinkProviderImpl
         map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MINOR_VERSION, mojo.getDatabaseMinorVersion());
         // source selection
         map.put(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SOURCE, mojo.getCreateSourceMode());
-        if (mojo.getCreateSourceFile() != null) {
+        if (mojo.getCreateSourceFile() == null) {
+            if (!PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE.equals(mojo.getCreateSourceMode())) {
+                throw new IllegalArgumentException("create source file is required for mode "
+                                                   + mojo.getCreateSourceMode());
+            }
+        } else {
             map.put(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SCRIPT_SOURCE,
                     mojo.getCreateSourceFile().toURI().toString());
         }
         map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SOURCE, mojo.getDropSourceMode());
-        if (mojo.getDropSourceFile() != null) {
+        if (mojo.getDropSourceFile() == null) {
+            if (!PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE.equals(mojo.getDropSourceMode())) {
+                throw new IllegalArgumentException("drop source file is required for mode "
+                                                   + mojo.getDropSourceMode());
+            }
+        } else {
             map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SCRIPT_SOURCE,
                     mojo.getCreateSourceFile().toURI().toString());
         }
