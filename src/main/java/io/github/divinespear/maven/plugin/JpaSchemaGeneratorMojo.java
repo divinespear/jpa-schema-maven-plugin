@@ -28,12 +28,9 @@ import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -246,6 +243,9 @@ public class JpaSchemaGeneratorMojo
      * <li>The value of this property should be the value returned for the target database by
      * {@link DatabaseMetaData#getDatabaseProductName()}</li>
      * </ul>
+     * Note you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
+     * 
+     * @since JPA 2.1
      */
     @Parameter
     private String databaseProductName;
@@ -262,6 +262,9 @@ public class JpaSchemaGeneratorMojo
      * <li>The value of this property should be the value returned for the target database by
      * {@link DatabaseMetaData#getDatabaseMajorVersion()}</li>
      * </ul>
+     * Note you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
+     * 
+     * @since JPA 2.1
      */
     @Parameter
     private Integer databaseMajorVersion;
@@ -278,6 +281,9 @@ public class JpaSchemaGeneratorMojo
      * <li>The value of this property should be the value returned for the target database by
      * {@link DatabaseMetaData#getDatabaseMinorVersion()}</li>
      * </ul>
+     * Note you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
+     * 
+     * @since JPA 2.1
      */
     @Parameter
     private Integer databaseMinorVersion;
@@ -346,18 +352,7 @@ public class JpaSchemaGeneratorMojo
             if (this.scanTestClasses) {
                 classfiles.addAll(this.project.getTestClasspathElements());
             }
-            // artifact dependency cache for "runtime" scope
-            synchronized (RESOLVED_ARTIFACTS) {
-                for (Artifact artifact : this.project.getDependencyArtifacts()) {
-                    // TODO: maybe filter "provided" too
-                    if (!"test".equalsIgnoreCase(artifact.getScope()) && artifact.getFile() == null) {
-                        Artifact resolved = this.session.getLocalRepository().find(artifact);
-                        RESOLVED_ARTIFACTS.add(resolved.getFile().toString());
-                    }
-                }
-            }
-            classfiles.addAll(RESOLVED_ARTIFACTS);
-
+            // classpath to url
             List<URL> classURLs = new ArrayList<URL>(classfiles.size());
             log.debug("* Dependencies:");
             for (String classfile : classfiles) {
@@ -371,7 +366,6 @@ public class JpaSchemaGeneratorMojo
     }
 
     private static final URL[] EMPTY_URLS = new URL[0];
-    private static final Set<String> RESOLVED_ARTIFACTS = new HashSet<String>();
     private static final Map<String, SchemaGeneratorProvider> PROVIDER_MAP;
     static {
         Map<String, SchemaGeneratorProvider> map = new HashMap<String, SchemaGeneratorProvider>();
