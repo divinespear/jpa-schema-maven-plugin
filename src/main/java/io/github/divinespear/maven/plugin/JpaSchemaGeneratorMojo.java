@@ -78,13 +78,13 @@ public class JpaSchemaGeneratorMojo
      * skip schema generation
      */
     @Parameter(property = "jpa-schema.generate.skip", required = true, defaultValue = "false")
-    private boolean skip;
+    private boolean skip = false;
 
     /**
      * scan test classes
      */
     @Parameter(property = "jpa-schema.generate.scan-test-classes", required = true, defaultValue = "false")
-    private boolean scanTestClasses;
+    private boolean scanTestClasses = false;
 
     /**
      * JPA version
@@ -98,7 +98,7 @@ public class JpaSchemaGeneratorMojo
      * </ul>
      */
     @Parameter(required = true, defaultValue = "2.1")
-    private String jpaVersion;
+    private String jpaVersion = "2.1";
 
     /**
      * JPA implementation
@@ -106,13 +106,13 @@ public class JpaSchemaGeneratorMojo
      * support value is <code>eclipselink</code> or <code>hibernate</code>, as case-insensitive.
      */
     @Parameter(required = true, defaultValue = "eclipselink")
-    private String implementation;
+    private String implementation = "eclipselink";
 
     /**
      * location of <code>persistence.xml</code> file
      */
     @Parameter(required = true, defaultValue = "META-INF/persistence.xml")
-    private String persistenceXml;
+    private String persistenceXml = "META-INF/persistence.xml";
 
     public String getPersistenceXml() {
         return persistenceXml;
@@ -122,7 +122,7 @@ public class JpaSchemaGeneratorMojo
      * unit name of <code>persistence.xml</code>
      */
     @Parameter(required = true, defaultValue = "default")
-    private String persistenceUnitName;
+    private String persistenceUnitName = "default";
 
     public String getPersistenceUnitName() {
         return persistenceUnitName;
@@ -134,7 +134,7 @@ public class JpaSchemaGeneratorMojo
      * support value is <code>database</code>, <code>script</code>, or <code>both</code>.
      */
     @Parameter(required = true, defaultValue = "both")
-    private String target;
+    private String target = "both";
 
     public String getTarget() {
         return target;
@@ -146,7 +146,7 @@ public class JpaSchemaGeneratorMojo
      * support value is <code>create</code>, <code>drop</code>, or <code>drop-and-create</code>.
      */
     @Parameter(required = true, defaultValue = "drop-and-create")
-    private String mode;
+    private String mode = "drop-and-create";
 
     public String getMode() {
         return mode;
@@ -194,7 +194,7 @@ public class JpaSchemaGeneratorMojo
      * @since JPA 2.1
      */
     @Parameter(defaultValue = "metadata")
-    private String createSourceMode;
+    private String createSourceMode = "metadata";
 
     public String getCreateSourceMode() {
         return createSourceMode;
@@ -229,8 +229,8 @@ public class JpaSchemaGeneratorMojo
      * @since JPA 2.1
      */
     @Parameter(defaultValue = "metadata")
-    private String dropSourceMode;
-    
+    private String dropSourceMode = "metadata";
+
     public String getDropSourceMode() {
         return dropSourceMode;
     }
@@ -247,7 +247,7 @@ public class JpaSchemaGeneratorMojo
      */
     @Parameter
     private File dropSourceFile;
-    
+
     public File getDropSourceFile() {
         return dropSourceFile;
     }
@@ -369,7 +369,7 @@ public class JpaSchemaGeneratorMojo
             return;
         }
 
-        log.info("* JPA Version           : " + this.jpaVersion);
+        // log.info("* JPA Version           : " + this.jpaVersion);
         log.info("* JPA Implementation    : " + this.implementation);
         log.info("* Persistence XML       : " + this.persistenceXml);
         log.info("* Persistence Unit Name : " + this.persistenceUnitName);
@@ -404,7 +404,8 @@ public class JpaSchemaGeneratorMojo
             }
         }
 
-        final String providerId = (this.implementation.toLowerCase() + "_" + this.jpaVersion.toLowerCase()).trim();
+        // final String providerId = (this.implementation.toLowerCase() + "_" + this.jpaVersion.toLowerCase()).trim();
+        final String providerId = this.implementation.toLowerCase().trim();
         final SchemaGeneratorProvider provider = PROVIDER_MAP.get(providerId);
         log.info("* Selected provider     : " + providerId + "(" + provider.getClass().toString() + ")");
 

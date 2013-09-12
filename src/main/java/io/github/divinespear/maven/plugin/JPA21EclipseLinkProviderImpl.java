@@ -33,7 +33,7 @@ class JPA21EclipseLinkProviderImpl
         extends BaseProviderImpl {
 
     public JPA21EclipseLinkProviderImpl() {
-        super("eclipselink_2.1");
+        super("eclipselink");
     }
 
     private static final String
