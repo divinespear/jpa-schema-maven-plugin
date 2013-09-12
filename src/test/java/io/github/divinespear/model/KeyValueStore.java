@@ -1,4 +1,4 @@
-package io.github.divinespear;
+package io.github.divinespear.model;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
