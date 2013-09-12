@@ -26,6 +26,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.Arrays;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
@@ -74,5 +80,51 @@ public class JpaSchemaGeneratorMojoTest
         assertThat("create script should be generated.", createScriptFile.exists(), is(true));
         File dropScriptFile = new File(mojo.getOutputDirectory(), mojo.getDropOutputFileName());
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
+    }
+
+    @Test
+    public void testGenerateDatabaseUsingEclipseLink() throws Exception {
+        // delete database if exists
+        File databaseFile = new File(getBasedir(), "target/test-classes/eclipselink-simple-database-test.h2.db");
+        if (databaseFile.exists()) {
+            databaseFile.delete();
+        }
+
+        JpaSchemaGeneratorMojo mojo = findMojoFromPath("target/test-classes/unit/eclipselink-simple-database-test");
+        mojo.execute();
+
+        // database check
+        Connection connection = DriverManager.getConnection(mojo.getJdbcUrl(),
+                                                            mojo.getJdbcUser(),
+                                                            mojo.getJdbcPassword());
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = null;
+            try {
+                resultSet = statement.executeQuery("SELECT * FROM KEY_VALUE_STORE");
+                try {
+                    ResultSetMetaData metaData = resultSet.getMetaData();
+                    assertThat(metaData.getColumnCount(), is(2));
+                    assertThat(metaData.getColumnName(1), is("STORED_KEY"));
+                    assertThat(metaData.getColumnName(2), is("STORED_VALUE"));
+                } finally {
+                    resultSet.close();
+                }
+                resultSet = statement.executeQuery("SELECT * FROM MANY_COLUMN_TABLE");
+                try {
+                    ResultSetMetaData metaData = resultSet.getMetaData();
+                    assertThat(metaData.getColumnCount(), is(31));
+                    assertThat(metaData.getColumnName(1), is("ID"));
+                    assertThat(metaData.getColumnType(1), is(Types.BIGINT));
+                    assertThat(metaData.getColumnName(2), is("COLUMN00"));
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
+            }
+        } finally {
+            connection.close();
+        }
     }
 }

@@ -60,8 +60,10 @@ abstract class BaseProviderImpl
             }
 
             // post-process: append semicolon(;) at end of line.
-            this.appendSemiColonAtEol(new File(mojo.getOutputDirectory(), mojo.getCreateOutputFileName()));
-            this.appendSemiColonAtEol(new File(mojo.getOutputDirectory(), mojo.getDropOutputFileName()));
+            if (mojo.getOutputDirectory() != null) {
+                this.appendSemiColonAtEol(new File(mojo.getOutputDirectory(), mojo.getCreateOutputFileName()));
+                this.appendSemiColonAtEol(new File(mojo.getOutputDirectory(), mojo.getDropOutputFileName()));
+            }
         }
     }
 

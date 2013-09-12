@@ -373,7 +373,7 @@ public class JpaSchemaGeneratorMojo
         log.info("  - JDBC Username        : " + this.jdbcUser);
         log.info("  - JDBC Password        : " + this.jdbcPassword);
 
-        if (!this.outputDirectory.exists()) {
+        if (this.outputDirectory != null && !this.outputDirectory.exists()) {
             this.outputDirectory.mkdirs();
         }
 

@@ -63,15 +63,19 @@ class EclipseLinkProviderImpl
         map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DATABASE_ACTION, databaseMode);
         map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_ACTION, scriptMode);
         // output files
-        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_CREATE_TARGET,
-                new File(mojo.getOutputDirectory(), mojo.getCreateOutputFileName()).toURI().toString());
-        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_DROP_TARGET,
-                new File(mojo.getOutputDirectory(), mojo.getDropOutputFileName()).toURI().toString());
+        if (!PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equals(scriptMode)) {
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_CREATE_TARGET,
+                    new File(mojo.getOutputDirectory(), mojo.getCreateOutputFileName()).toURI().toString());
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_DROP_TARGET,
+                    new File(mojo.getOutputDirectory(), mojo.getDropOutputFileName()).toURI().toString());
+        }
         // database options
-        map.put(PersistenceUnitProperties.JDBC_DRIVER, mojo.getJdbcDriver());
-        map.put(PersistenceUnitProperties.JDBC_URL, mojo.getJdbcUrl());
-        map.put(PersistenceUnitProperties.JDBC_USER, mojo.getJdbcUser());
-        map.put(PersistenceUnitProperties.JDBC_PASSWORD, mojo.getJdbcPassword());
+        if (!PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equals(databaseMode)) {
+            map.put(PersistenceUnitProperties.JDBC_DRIVER, mojo.getJdbcDriver());
+            map.put(PersistenceUnitProperties.JDBC_URL, mojo.getJdbcUrl());
+            map.put(PersistenceUnitProperties.JDBC_USER, mojo.getJdbcUser());
+            map.put(PersistenceUnitProperties.JDBC_PASSWORD, mojo.getJdbcPassword());
+        }
         // database emulation options
         map.put(PersistenceUnitProperties.SCHEMA_DATABASE_PRODUCT_NAME, mojo.getDatabaseProductName());
         map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MAJOR_VERSION, mojo.getDatabaseMajorVersion());
