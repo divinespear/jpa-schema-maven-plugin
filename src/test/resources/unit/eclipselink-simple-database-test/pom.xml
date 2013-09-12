@@ -28,7 +28,7 @@
 				<configuration>
 					<implementation>eclipselink</implementation>
 					<persistenceXml>META-INF/persistence-21-e.xml</persistenceXml>
-					<target>database</target>
+					<databaseAction>drop-and-create</databaseAction>
 					<jdbcDriver>org.h2.Driver</jdbcDriver>
 					<jdbcUrl>jdbc:h2:nio:${basedir}/target/test-classes/eclipselink-simple-database-test</jdbcUrl>
 					<jdbcUser>sa</jdbcUser>

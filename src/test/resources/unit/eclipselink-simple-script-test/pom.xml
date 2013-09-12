@@ -31,7 +31,7 @@
 					<outputDirectory>${basedir}/target/test-classes/generated-schema</outputDirectory>
 					<createOutputFileName>eclipselink-simple-script-test-create.sql</createOutputFileName>
 					<dropOutputFileName>eclipselink-simple-script-test-drop.sql</dropOutputFileName>
-					<target>script</target>
+					<scriptAction>drop-and-create</scriptAction>
 					<databaseProductName>H2</databaseProductName>
 					<databaseMajorVersion>1</databaseMajorVersion>
 					<databaseMinorVersion>3</databaseMinorVersion>
