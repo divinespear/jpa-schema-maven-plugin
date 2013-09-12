@@ -29,8 +29,8 @@
 					<implementation>eclipselink</implementation>
 					<persistenceXml>META-INF/persistence-21-e.xml</persistenceXml>
 					<outputDirectory>${basedir}/target/test-classes/generated-schema</outputDirectory>
-					<createOutputFileName>eclipselink-jpa21-script-test-create.sql</createOutputFileName>
-					<dropOutputFileName>eclipselink-jpa21-script-test-drop.sql</dropOutputFileName>
+					<createOutputFileName>eclipselink-simple-script-test-create.sql</createOutputFileName>
+					<dropOutputFileName>eclipselink-simple-script-test-drop.sql</dropOutputFileName>
 					<target>script</target>
 					<databaseProductName>H2</databaseProductName>
 					<databaseMajorVersion>1</databaseMajorVersion>

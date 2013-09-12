@@ -65,9 +65,10 @@ public class JpaSchemaGeneratorMojoTest
     }
 
     @Test
-    public void testGenerateScriptUsingEclipseLinkJPA21() throws Exception {
-        JpaSchemaGeneratorMojo mojo = findMojoFromPath("target/test-classes/unit/eclipselink-jpa21-script-test");
+    public void testGenerateScriptUsingEclipseLink() throws Exception {
+        JpaSchemaGeneratorMojo mojo = findMojoFromPath("target/test-classes/unit/eclipselink-simple-script-test");
         mojo.execute();
+
         // file check
         File createScriptFile = new File(mojo.getOutputDirectory(), mojo.getCreateOutputFileName());
         assertThat("create script should be generated.", createScriptFile.exists(), is(true));
