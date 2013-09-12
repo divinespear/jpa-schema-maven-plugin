@@ -20,13 +20,12 @@ package io.github.divinespear.maven.plugin;
  */
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Persistence;
 
+import org.apache.commons.lang.NullArgumentException;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 class EclipseLinkProviderImpl
@@ -36,50 +35,39 @@ class EclipseLinkProviderImpl
         super("eclipselink");
     }
 
-    private static final String
-            TARGET_DATABASE = "database",
-            TARGET_SCRIPT = "script",
-            TARGET_BOTH = "both";
-    private static final List<String>
-            TARGET_DATABASE_LIST = Arrays.asList(TARGET_DATABASE, TARGET_BOTH),
-            TARGET_SCRIPT_LIST = Arrays.asList(TARGET_SCRIPT, TARGET_BOTH);
-
     @Override
     protected void doExecute(JpaSchemaGeneratorMojo mojo) {
-        final String target = mojo.getTarget().toLowerCase();
-        String databaseMode = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION;
-        if (TARGET_DATABASE_LIST.contains(target)) {
-            databaseMode = mojo.getMode();
-        }
-        String scriptMode = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION;
-        if (TARGET_SCRIPT_LIST.contains(target)) {
-            scriptMode = mojo.getMode();
-        }
+        boolean useDB = !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(mojo.getDatabaseAction());
+        boolean useScript = !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(mojo.getScriptAction());
 
         Map<String, String> map = new HashMap<String, String>();
         // persistence.xml
         map.put(PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML, mojo.getPersistenceXml());
         // mode
-        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DATABASE_ACTION, databaseMode);
-        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_ACTION, scriptMode);
+        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DATABASE_ACTION, mojo.getDatabaseAction().toLowerCase());
+        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_ACTION, mojo.getScriptAction().toLowerCase());
         // output files
-        if (!PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equals(scriptMode)) {
-            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_CREATE_TARGET,
-                    new File(mojo.getOutputDirectory(), mojo.getCreateOutputFileName()).toURI().toString());
-            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_DROP_TARGET,
-                    new File(mojo.getOutputDirectory(), mojo.getDropOutputFileName()).toURI().toString());
+        // database emulation options
+        if (useScript) {
+            if (mojo.getOutputDirectory() == null) {
+                throw new NullArgumentException("outputDirectory is required for script generation.");
+            }
+            final File c = new File(mojo.getOutputDirectory(), mojo.getCreateOutputFileName());
+            final File d = new File(mojo.getOutputDirectory(), mojo.getDropOutputFileName());
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_CREATE_TARGET, c.toURI().toString());
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_DROP_TARGET, d.toURI().toString());
+
+            map.put(PersistenceUnitProperties.SCHEMA_DATABASE_PRODUCT_NAME, mojo.getDatabaseProductName());
+            map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MAJOR_VERSION, mojo.getDatabaseMajorVersion());
+            map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MINOR_VERSION, mojo.getDatabaseMinorVersion());
         }
         // database options
-        if (!PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equals(databaseMode)) {
+        if (useDB) {
             map.put(PersistenceUnitProperties.JDBC_DRIVER, mojo.getJdbcDriver());
             map.put(PersistenceUnitProperties.JDBC_URL, mojo.getJdbcUrl());
             map.put(PersistenceUnitProperties.JDBC_USER, mojo.getJdbcUser());
             map.put(PersistenceUnitProperties.JDBC_PASSWORD, mojo.getJdbcPassword());
         }
-        // database emulation options
-        map.put(PersistenceUnitProperties.SCHEMA_DATABASE_PRODUCT_NAME, mojo.getDatabaseProductName());
-        map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MAJOR_VERSION, mojo.getDatabaseMajorVersion());
-        map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MINOR_VERSION, mojo.getDatabaseMinorVersion());
         // source selection
         map.put(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SOURCE, mojo.getCreateSourceMode());
         if (mojo.getCreateSourceFile() == null) {

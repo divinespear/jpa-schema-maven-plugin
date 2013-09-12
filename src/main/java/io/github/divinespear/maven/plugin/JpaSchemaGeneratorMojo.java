@@ -118,31 +118,34 @@ public class JpaSchemaGeneratorMojo
     }
 
     /**
-     * schema generation target
+     * schema generation action for database
      * <p>
-     * support value is <code>database</code>, <code>script</code>, or <code>both</code>.
+     * support value is <code>none</code>, <code>create</code>, <code>drop</code>, or <code>drop-and-create</code>.
      */
-    @Parameter(required = true, defaultValue = "both")
-    private String target = "both";
+    @Parameter(required = true, defaultValue = "none")
+    private String databaseAction = "none";
 
-    public String getTarget() {
-        return target;
+    public String getDatabaseAction() {
+        return databaseAction;
     }
 
     /**
-     * schema generation mode
+     * schema generation action for script
      * <p>
-     * support value is <code>create</code>, <code>drop</code>, or <code>drop-and-create</code>.
+     * support value is <code>none</code>, <code>create</code>, <code>drop</code>, or <code>drop-and-create</code>.
      */
-    @Parameter(required = true, defaultValue = "drop-and-create")
-    private String mode = "drop-and-create";
+    @Parameter(required = true, defaultValue = "none")
+    private String scriptAction = "none";
 
-    public String getMode() {
-        return mode;
+    public String getScriptAction() {
+        return scriptAction;
     }
 
     /**
      * output directory for generated ddl scripts
+     * <p>
+     * REQUIRED for {@link #scriptAction} is one of <code>create</code>, <code>drop</code>, or
+     * <code>drop-and-create</code>.
      */
     @Parameter(defaultValue = "${project.build.directory}/generated-schema")
     private File outputDirectory;
@@ -153,6 +156,8 @@ public class JpaSchemaGeneratorMojo
 
     /**
      * generated create script name
+     * <p>
+     * REQUIRED for {@link #scriptAction} is one of <code>create</code>, or <code>drop-and-create</code>.
      */
     @Parameter(defaultValue = "create.sql")
     private String createOutputFileName;
@@ -163,6 +168,8 @@ public class JpaSchemaGeneratorMojo
 
     /**
      * generated drop script name
+     * <p>
+     * REQUIRED for {@link #scriptAction} is one of <code>drop</code>, or <code>drop-and-create</code>.
      */
     @Parameter(defaultValue = "drop.sql")
     private String dropOutputFileName;
@@ -177,8 +184,6 @@ public class JpaSchemaGeneratorMojo
      * <p>
      * support value is <code>metadata</code>, <code>script</code>, <code>metadata-then-script</code>, or
      * <code>script-then-metadata</code>.
-     * <p>
-     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode.
      * 
      * @since JPA 2.1
      */
@@ -192,10 +197,8 @@ public class JpaSchemaGeneratorMojo
     /**
      * create source file path.
      * <p>
-     * this is REQUIRED if you pick {@link #createSourceMode} as <code>script</code>, <code>metadata-then-script</code>,
-     * or <code>script-then-metadata</code>.
-     * <p>
-     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode.
+     * REQUIRED for {@link #createSourceMode} is one of <code>script</code>, <code>metadata-then-script</code>, or
+     * <code>script-then-metadata</code>.
      * 
      * @since JPA 2.1
      */
@@ -212,8 +215,6 @@ public class JpaSchemaGeneratorMojo
      * <p>
      * support value is <code>metadata</code>, <code>script</code>, <code>metadata-then-script</code>, or
      * <code>script-then-metadata</code>.
-     * <p>
-     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode.
      * 
      * @since JPA 2.1
      */
@@ -227,10 +228,8 @@ public class JpaSchemaGeneratorMojo
     /**
      * drop source file path.
      * <p>
-     * this is REQUIRED if you pick {@link #dropSourceMode} as <code>script</code>, <code>metadata-then-script</code>,
-     * or <code>script-then-metadata</code>.
-     * <p>
-     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode.
+     * REQUIRED for {@link #dropSourceMode} is one of <code>script</code>, <code>metadata-then-script</code>, or
+     * <code>script-then-metadata</code>.
      * 
      * @since JPA 2.1
      */
@@ -361,8 +360,8 @@ public class JpaSchemaGeneratorMojo
         log.info("* JPA Implementation    : " + this.implementation);
         log.info("* Persistence XML       : " + this.persistenceXml);
         log.info("* Persistence Unit Name : " + this.persistenceUnitName);
-        log.info("* Generation Target     : " + this.target);
-        log.info("* Generation Mode       : " + this.mode);
+        log.info("* Action for Database   : " + this.databaseAction);
+        log.info("* Action for Script     : " + this.scriptAction);
         log.info("* Output Directory      : " + this.outputDirectory);
         log.info("  - Create Script Name  : " + this.createOutputFileName);
         log.info("  - Drop Script Name    : " + this.dropOutputFileName);
