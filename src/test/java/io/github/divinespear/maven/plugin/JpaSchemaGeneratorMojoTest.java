@@ -70,6 +70,12 @@ public class JpaSchemaGeneratorMojoTest
         return mojo;
     }
 
+    /**
+     * Simple schema generation test for script using EclipseLink
+     * 
+     * @throws Exception
+     *             if any exception raises
+     */
     @Test
     public void testGenerateScriptUsingEclipseLink() throws Exception {
         JpaSchemaGeneratorMojo mojo = findMojoFromPath("target/test-classes/unit/eclipselink-simple-script-test");
@@ -82,6 +88,12 @@ public class JpaSchemaGeneratorMojoTest
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
     }
 
+    /**
+     * Simple schema generation test for database using EclipseLink
+     * 
+     * @throws Exception
+     *             if any exception raises
+     */
     @Test
     public void testGenerateDatabaseUsingEclipseLink() throws Exception {
         // delete database if exists
