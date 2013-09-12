@@ -354,27 +354,9 @@ public class JpaSchemaGeneratorMojo
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (this.skip) {
-            log.info("Generating schema is skipped.");
+            log.info("schema generation is skipped.");
             return;
         }
-
-        log.info("* JPA Implementation    : " + this.implementation);
-        log.info("* Persistence XML       : " + this.persistenceXml);
-        log.info("* Persistence Unit Name : " + this.persistenceUnitName);
-        log.info("* Action for Database   : " + this.databaseAction);
-        log.info("* Action for Script     : " + this.scriptAction);
-        log.info("* Output Directory      : " + this.outputDirectory);
-        log.info("  - Create Script Name  : " + this.createOutputFileName);
-        log.info("  - Drop Script Name    : " + this.dropOutputFileName);
-        log.info("");
-        log.info("* Options");
-        log.info("  - DatabaseProductName  : " + this.databaseProductName);
-        log.info("  - DatabaseMajorVersion : " + this.databaseMajorVersion);
-        log.info("  - databaseMinorVersion : " + this.databaseMinorVersion);
-        log.info("  - JDBC Driver          : " + this.jdbcDriver);
-        log.info("  - JDBC URL             : " + this.jdbcUrl);
-        log.info("  - JDBC Username        : " + this.jdbcUser);
-        log.info("  - JDBC Password        : " + this.jdbcPassword);
 
         if (this.outputDirectory != null && !this.outputDirectory.exists()) {
             this.outputDirectory.mkdirs();
@@ -412,9 +394,7 @@ public class JpaSchemaGeneratorMojo
             }
             // classpath to url
             List<URL> classURLs = new ArrayList<URL>(classfiles.size());
-            log.debug("* Dependencies:");
             for (String classfile : classfiles) {
-                log.debug("  - " + classfile);
                 classURLs.add(new File(classfile).toURI().toURL());
             }
             return new URLClassLoader(classURLs.toArray(EMPTY_URLS), this.getClass().getClassLoader());
