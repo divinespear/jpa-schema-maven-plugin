@@ -96,6 +96,9 @@ public class JpaSchemaGeneratorMojo
 
     /**
      * location of <code>persistence.xml</code> file
+     * <p>
+     * Note for Hibernate: <b>current version (4.3.0.beta3) DOES NOT SUPPORT custom location.</b> so you're
+     * configuration will be ignored.
      */
     @Parameter(required = true, defaultValue = "META-INF/persistence.xml")
     private String persistenceXml = "META-INF/persistence.xml";
