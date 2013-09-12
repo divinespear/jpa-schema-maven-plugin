@@ -29,10 +29,10 @@ import javax.persistence.Persistence;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
-class JPA21EclipseLinkProviderImpl
+class EclipseLinkProviderImpl
         extends BaseProviderImpl {
 
-    public JPA21EclipseLinkProviderImpl() {
+    public EclipseLinkProviderImpl() {
         super("eclipselink");
     }
 

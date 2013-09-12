@@ -87,20 +87,6 @@ public class JpaSchemaGeneratorMojo
     private boolean scanTestClasses = false;
 
     /**
-     * JPA version
-     * <p>
-     * support value is <code>2.0</code> or <code>2.1</code>.
-     * <p>
-     * Note for JPA 2.1, version of implementation must be:
-     * <ul>
-     * <li>EclipseLink: 2.5.0 or newer</li>
-     * <li>Hibernate: 4.3.0 or newer</li>
-     * </ul>
-     */
-    @Parameter(required = true, defaultValue = "2.1")
-    private String jpaVersion = "2.1";
-
-    /**
      * JPA implementation
      * <p>
      * support value is <code>eclipselink</code> or <code>hibernate</code>, as case-insensitive.
@@ -369,7 +355,6 @@ public class JpaSchemaGeneratorMojo
             return;
         }
 
-        // log.info("* JPA Version           : " + this.jpaVersion);
         log.info("* JPA Implementation    : " + this.implementation);
         log.info("* Persistence XML       : " + this.persistenceXml);
         log.info("* Persistence Unit Name : " + this.persistenceUnitName);
@@ -404,7 +389,6 @@ public class JpaSchemaGeneratorMojo
             }
         }
 
-        // final String providerId = (this.implementation.toLowerCase() + "_" + this.jpaVersion.toLowerCase()).trim();
         final String providerId = this.implementation.toLowerCase().trim();
         final SchemaGeneratorProvider provider = PROVIDER_MAP.get(providerId);
         log.info("* Selected provider     : " + providerId + "(" + provider.getClass().toString() + ")");
@@ -441,7 +425,7 @@ public class JpaSchemaGeneratorMojo
     static {
         Map<String, SchemaGeneratorProvider> map = new HashMap<String, SchemaGeneratorProvider>();
         try {
-            registerProvider(map, JPA21EclipseLinkProviderImpl.class);
+            registerProvider(map, EclipseLinkProviderImpl.class);
             PROVIDER_MAP = Collections.unmodifiableMap(map);
         } catch (Exception e) {
             throw new RuntimeException("exception while initialize", e);
