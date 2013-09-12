@@ -120,7 +120,8 @@ public class JpaSchemaGeneratorMojo
     /**
      * schema generation action for database
      * <p>
-     * support value is <code>none</code>, <code>create</code>, <code>drop</code>, or <code>drop-and-create</code>.
+     * support value is <code>none</code>, <code>create</code>, <code>drop</code>, <code>drop-and-create</code>, or
+     * <code>create-or-extend-tables</code> (EclipseLink only).
      */
     @Parameter(required = true, defaultValue = "none")
     private String databaseAction = "none";
