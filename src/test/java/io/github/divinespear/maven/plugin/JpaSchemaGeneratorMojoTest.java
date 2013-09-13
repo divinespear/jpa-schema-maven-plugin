@@ -22,8 +22,8 @@ package io.github.divinespear.maven.plugin;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.sql.Connection;
@@ -33,9 +33,15 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,15 +63,36 @@ public class JpaSchemaGeneratorMojoTest
         super.tearDown();
     }
 
-    private JpaSchemaGeneratorMojo findMojoFromPath(String path) throws Exception {
-        File pomfile = new File(new File(getBasedir(), path), POM_FILENAME);
+    private File getPomFile(String path) {
+        return this.getPomFile(path, POM_FILENAME);
+    }
+
+    private File getPomFile(String path,
+                            String pomFileName) {
+        return new File(new File(getBasedir(), path), pomFileName);
+    }
+
+    private void compileJpaModelSources(File pomfile) throws MavenInvocationException {
+        InvocationRequest request = new DefaultInvocationRequest();
+        request.setPomFile(pomfile);
+        request.setGoals(Collections.singletonList("compile"));
+
+        Invoker invoker = new DefaultInvoker();
+        invoker.execute(request);
+    }
+
+    private JpaSchemaGeneratorMojo executeSchemaGeneration(File pomfile) throws Exception {
+        String parent = pomfile.getParent().toString();
         // create mojo
         JpaSchemaGeneratorMojo mojo = (JpaSchemaGeneratorMojo) lookupMojo("generate", pomfile);
         assertThat(mojo, notNullValue(JpaSchemaGeneratorMojo.class));
         // configure project mock
         MavenProject projectMock = mock(MavenProject.class);
-        when(projectMock.getCompileClasspathElements()).thenReturn(Arrays.asList(getBasedir() + "/target/test-classes"));
+        doReturn(Arrays.asList(parent + "/target/classes")).when(projectMock)
+                                                           .getCompileClasspathElements();
         setVariableValueToObject(mojo, "project", projectMock);
+        // execute
+        mojo.execute();
 
         return mojo;
     }
@@ -78,8 +105,10 @@ public class JpaSchemaGeneratorMojoTest
      */
     @Test
     public void testGenerateScriptUsingEclipseLink() throws Exception {
-        JpaSchemaGeneratorMojo mojo = findMojoFromPath("target/test-classes/unit/eclipselink-simple-script-test");
-        mojo.execute();
+        final File pomfile = this.getPomFile("target/test-classes/unit/eclipselink-simple-script-test");
+
+        this.compileJpaModelSources(pomfile);
+        JpaSchemaGeneratorMojo mojo = this.executeSchemaGeneration(pomfile);
 
         // file check
         File createScriptFile = new File(mojo.getOutputDirectory(), mojo.getCreateOutputFileName());
@@ -97,13 +126,16 @@ public class JpaSchemaGeneratorMojoTest
     @Test
     public void testGenerateDatabaseUsingEclipseLink() throws Exception {
         // delete database if exists
-        File databaseFile = new File(getBasedir(), "target/test-classes/eclipselink-simple-database-test.h2.db");
+        File databaseFile = new File(getBasedir(),
+                                     "target/test-classes/unit/eclipselink-simple-database-test/target/test.h2.db");
         if (databaseFile.exists()) {
             databaseFile.delete();
         }
 
-        JpaSchemaGeneratorMojo mojo = findMojoFromPath("target/test-classes/unit/eclipselink-simple-database-test");
-        mojo.execute();
+        final File pomfile = this.getPomFile("target/test-classes/unit/eclipselink-simple-database-test");
+
+        this.compileJpaModelSources(pomfile);
+        JpaSchemaGeneratorMojo mojo = this.executeSchemaGeneration(pomfile);
 
         // database check
         Connection connection = DriverManager.getConnection(mojo.getJdbcUrl(),
