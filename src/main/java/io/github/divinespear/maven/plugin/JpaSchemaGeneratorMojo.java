@@ -185,8 +185,6 @@ public class JpaSchemaGeneratorMojo
      * <p>
      * support value is <code>metadata</code>, <code>script</code>, <code>metadata-then-script</code>, or
      * <code>script-then-metadata</code>.
-     * 
-     * @since JPA 2.1
      */
     @Parameter(defaultValue = "metadata")
     private String createSourceMode = "metadata";
@@ -200,8 +198,6 @@ public class JpaSchemaGeneratorMojo
      * <p>
      * REQUIRED for {@link #createSourceMode} is one of <code>script</code>, <code>metadata-then-script</code>, or
      * <code>script-then-metadata</code>.
-     * 
-     * @since JPA 2.1
      */
     @Parameter
     private File createSourceFile;
@@ -216,8 +212,6 @@ public class JpaSchemaGeneratorMojo
      * <p>
      * support value is <code>metadata</code>, <code>script</code>, <code>metadata-then-script</code>, or
      * <code>script-then-metadata</code>.
-     * 
-     * @since JPA 2.1
      */
     @Parameter(defaultValue = "metadata")
     private String dropSourceMode = "metadata";
@@ -231,8 +225,6 @@ public class JpaSchemaGeneratorMojo
      * <p>
      * REQUIRED for {@link #dropSourceMode} is one of <code>script</code>, <code>metadata-then-script</code>, or
      * <code>script-then-metadata</code>.
-     * 
-     * @since JPA 2.1
      */
     @Parameter
     private File dropSourceFile;
@@ -302,9 +294,6 @@ public class JpaSchemaGeneratorMojo
      * <li>The value of this property should be the value returned for the target database by
      * {@link DatabaseMetaData#getDatabaseProductName()}</li>
      * </ul>
-     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
-     * 
-     * @since JPA 2.1
      */
     @Parameter
     private String databaseProductName;
@@ -321,9 +310,6 @@ public class JpaSchemaGeneratorMojo
      * <li>The value of this property should be the value returned for the target database by
      * {@link DatabaseMetaData#getDatabaseMajorVersion()}</li>
      * </ul>
-     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
-     * 
-     * @since JPA 2.1
      */
     @Parameter
     private Integer databaseMajorVersion;
@@ -340,9 +326,6 @@ public class JpaSchemaGeneratorMojo
      * <li>The value of this property should be the value returned for the target database by
      * {@link DatabaseMetaData#getDatabaseMinorVersion()}</li>
      * </ul>
-     * Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA 2.0 mode. please use JDBC connection.
-     * 
-     * @since JPA 2.1
      */
     @Parameter
     private Integer databaseMinorVersion;
