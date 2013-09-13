@@ -173,7 +173,8 @@
 <td>schema generation action for database 
 
 <p>support value is <tt>none</tt>, <tt>create</tt>,
-<tt>drop</tt>, or <tt>drop-and-create</tt>.</p><br /><b>Default value is</b>: <tt>none</tt>.<br /></td>
+<tt>drop</tt>, <tt>drop-and-create</tt>, or
+<tt>create-or-extend-tables</tt> (EclipseLink only).</p><br /><b>Default value is</b>: <tt>none</tt>.<br /></td>
           </tr>
           
 <tr class="a">
@@ -212,7 +213,7 @@
 <td>location of <tt>persistence.xml</tt> file 
 
 <p>Note for Hibernate: <b>current version (4.3.0.beta3) DOES NOT
-SUPPORT custom location.</b> so you're configuration will be
+SUPPORT custom location.</b> so your configuration will be
 ignored.</p><br /><b>Default value is</b>: <tt>META-INF/persistence.xml</tt>.<br /></td>
           </tr>
           
@@ -290,7 +291,7 @@ ignored.</p><br /><b>Default value is</b>: <tt>META-INF/persistence.xml</tt>.<br
             
 <td><tt>File</tt></td>
             
-<td><tt>JPA 2.1</tt></td>
+<td><tt>-</tt></td>
             
 <td>create source file path. 
 
@@ -305,7 +306,7 @@ ignored.</p><br /><b>Default value is</b>: <tt>META-INF/persistence.xml</tt>.<br
             
 <td><tt>String</tt></td>
             
-<td><tt>JPA 2.1</tt></td>
+<td><tt>-</tt></td>
             
 <td>specifies whether the creation of database artifacts is to occur on
 the basis of the object/relational mapping metadata, DDL script, or
@@ -322,7 +323,7 @@ a combination of the two.
             
 <td><tt>Integer</tt></td>
             
-<td><tt>JPA 2.1</tt></td>
+<td><tt>-</tt></td>
             
 <td>database major version for emulate database connection. this should
 useful for script-only action. 
@@ -336,9 +337,7 @@ included from
 <li>The value of this property should be the value returned for the
 target database by
 <tt>DatabaseMetaData.getDatabaseMajorVersion()</tt></li>
-</ul>
-Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
-2.0 mode. please use JDBC connection.<br /></td>
+</ul><br /></td>
           </tr>
           
 <tr class="b">
@@ -347,7 +346,7 @@ Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
             
 <td><tt>Integer</tt></td>
             
-<td><tt>JPA 2.1</tt></td>
+<td><tt>-</tt></td>
             
 <td>database minor version for emulate database connection. this should
 useful for script-only action. 
@@ -361,9 +360,7 @@ included from
 <li>The value of this property should be the value returned for the
 target database by
 <tt>DatabaseMetaData.getDatabaseMinorVersion()</tt></li>
-</ul>
-Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
-2.0 mode. please use JDBC connection.<br /></td>
+</ul><br /></td>
           </tr>
           
 <tr class="a">
@@ -372,7 +369,7 @@ Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
             
 <td><tt>String</tt></td>
             
-<td><tt>JPA 2.1</tt></td>
+<td><tt>-</tt></td>
             
 <td>database product name for emulate database connection. this should
 useful for script-only action. 
@@ -386,9 +383,7 @@ supplied.</li>
 <li>The value of this property should be the value returned for the
 target database by
 <tt>DatabaseMetaData.getDatabaseProductName()</tt></li>
-</ul>
-Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
-2.0 mode. please use JDBC connection.<br /></td>
+</ul><br /></td>
           </tr>
           
 <tr class="b">
@@ -411,7 +406,7 @@ Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
             
 <td><tt>File</tt></td>
             
-<td><tt>JPA 2.1</tt></td>
+<td><tt>-</tt></td>
             
 <td>drop source file path. 
 
@@ -426,7 +421,7 @@ Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
             
 <td><tt>String</tt></td>
             
-<td><tt>JPA 2.1</tt></td>
+<td><tt>-</tt></td>
             
 <td>specifies whether the dropping of database artifacts is to occur on
 the basis of the object/relational mapping metadata, DDL script, or
@@ -542,8 +537,6 @@ like Apache Derby, H2, etc...), it can be omitted.</p><br /></td>
           
 <li><b>Type</b>: <tt>java.io.File</tt></li>
           
-<li><b>Since</b>: <tt>JPA 2.1</tt></li>
-          
 <li><b>Required</b>: <tt>No</tt></li>
         </ul><hr />
 <p><b><a name="createSourceMode">createSourceMode</a>:</b></p>
@@ -560,8 +553,6 @@ a combination of the two.
           
 <li><b>Type</b>: <tt>java.lang.String</tt></li>
           
-<li><b>Since</b>: <tt>JPA 2.1</tt></li>
-          
 <li><b>Required</b>: <tt>No</tt></li>
           
 <li><b>Default</b>: <tt>metadata</tt></li>
@@ -571,7 +562,8 @@ a combination of the two.
 <div>schema generation action for database 
 
 <p>support value is <tt>none</tt>, <tt>create</tt>,
-<tt>drop</tt>, or <tt>drop-and-create</tt>.</p></div>
+<tt>drop</tt>, <tt>drop-and-create</tt>, or
+<tt>create-or-extend-tables</tt> (EclipseLink only).</p></div>
         
 <ul>
           
@@ -595,15 +587,11 @@ included from
 <li>The value of this property should be the value returned for the
 target database by
 <tt>DatabaseMetaData.getDatabaseMajorVersion()</tt></li>
-</ul>
-Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
-2.0 mode. please use JDBC connection.</div>
+</ul></div>
         
 <ul>
           
 <li><b>Type</b>: <tt>java.lang.Integer</tt></li>
-          
-<li><b>Since</b>: <tt>JPA 2.1</tt></li>
           
 <li><b>Required</b>: <tt>No</tt></li>
         </ul><hr />
@@ -621,15 +609,11 @@ included from
 <li>The value of this property should be the value returned for the
 target database by
 <tt>DatabaseMetaData.getDatabaseMinorVersion()</tt></li>
-</ul>
-Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
-2.0 mode. please use JDBC connection.</div>
+</ul></div>
         
 <ul>
           
 <li><b>Type</b>: <tt>java.lang.Integer</tt></li>
-          
-<li><b>Since</b>: <tt>JPA 2.1</tt></li>
           
 <li><b>Required</b>: <tt>No</tt></li>
         </ul><hr />
@@ -647,15 +631,11 @@ supplied.</li>
 <li>The value of this property should be the value returned for the
 target database by
 <tt>DatabaseMetaData.getDatabaseProductName()</tt></li>
-</ul>
-Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
-2.0 mode. please use JDBC connection.</div>
+</ul></div>
         
 <ul>
           
 <li><b>Type</b>: <tt>java.lang.String</tt></li>
-          
-<li><b>Since</b>: <tt>JPA 2.1</tt></li>
           
 <li><b>Required</b>: <tt>No</tt></li>
         </ul><hr />
@@ -686,8 +666,6 @@ Note this is JPA 2.1 feature, you CANNOT use this parameter on JPA
           
 <li><b>Type</b>: <tt>java.io.File</tt></li>
           
-<li><b>Since</b>: <tt>JPA 2.1</tt></li>
-          
 <li><b>Required</b>: <tt>No</tt></li>
         </ul><hr />
 <p><b><a name="dropSourceMode">dropSourceMode</a>:</b></p>
@@ -703,8 +681,6 @@ a combination of the two.
 <ul>
           
 <li><b>Type</b>: <tt>java.lang.String</tt></li>
-          
-<li><b>Since</b>: <tt>JPA 2.1</tt></li>
           
 <li><b>Required</b>: <tt>No</tt></li>
           
@@ -812,7 +788,7 @@ like Apache Derby, H2, etc...), it can be omitted.</p></div>
 <div>location of <tt>persistence.xml</tt> file 
 
 <p>Note for Hibernate: <b>current version (4.3.0.beta3) DOES NOT
-SUPPORT custom location.</b> so you're configuration will be
+SUPPORT custom location.</b> so your configuration will be
 ignored.</p></div>
         
 <ul>
