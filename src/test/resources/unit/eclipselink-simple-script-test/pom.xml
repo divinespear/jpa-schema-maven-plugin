@@ -49,7 +49,6 @@
 				<groupId>io.github.divinespear</groupId>
 				<artifactId>jpa-schema-maven-plugin</artifactId>
 				<configuration>
-					<implementation>eclipselink</implementation>
 					<outputDirectory>${basedir}/target/test-classes/unit/eclipselink-simple-script-test/target/generated-schema</outputDirectory>
 					<createOutputFileName>eclipselink-simple-script-test-create.sql</createOutputFileName>
 					<dropOutputFileName>eclipselink-simple-script-test-drop.sql</dropOutputFileName>

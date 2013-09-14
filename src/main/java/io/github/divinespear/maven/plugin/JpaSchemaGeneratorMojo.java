@@ -26,11 +26,13 @@ import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Persistence;
+
+import org.apache.commons.lang.NullArgumentException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -45,6 +47,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 /**
  * Generate database schema or DDL scripts.
@@ -80,19 +83,19 @@ public class JpaSchemaGeneratorMojo
     @Parameter(property = "jpa-schema.generate.skip", required = true, defaultValue = "false")
     private boolean skip = false;
 
+    public boolean isSkip() {
+        return skip;
+    }
+
     /**
      * scan test classes
      */
     @Parameter(property = "jpa-schema.generate.scan-test-classes", required = true, defaultValue = "false")
     private boolean scanTestClasses = false;
 
-    /**
-     * JPA implementation
-     * <p>
-     * support value is <code>eclipselink</code> or <code>hibernate</code>, as case-insensitive.
-     */
-    @Parameter(required = true, defaultValue = "eclipselink")
-    private String implementation = "eclipselink";
+    public boolean isScanTestClasses() {
+        return scanTestClasses;
+    }
 
     /**
      * location of <code>persistence.xml</code> file
@@ -100,8 +103,8 @@ public class JpaSchemaGeneratorMojo
      * Note for Hibernate: <b>current version (4.3.0.beta3) DOES NOT SUPPORT custom location.</b> so your configuration
      * will be ignored.
      */
-    @Parameter(required = true, defaultValue = "META-INF/persistence.xml")
-    private String persistenceXml = "META-INF/persistence.xml";
+    @Parameter(required = true, defaultValue = PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML_DEFAULT)
+    private String persistenceXml = PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML_DEFAULT;
 
     public String getPersistenceXml() {
         return persistenceXml;
@@ -123,8 +126,8 @@ public class JpaSchemaGeneratorMojo
      * support value is <code>none</code>, <code>create</code>, <code>drop</code>, <code>drop-and-create</code>, or
      * <code>create-or-extend-tables</code> (EclipseLink only).
      */
-    @Parameter(required = true, defaultValue = "none")
-    private String databaseAction = "none";
+    @Parameter(required = true, defaultValue = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION)
+    private String databaseAction = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION;
 
     public String getDatabaseAction() {
         return databaseAction;
@@ -135,8 +138,8 @@ public class JpaSchemaGeneratorMojo
      * <p>
      * support value is <code>none</code>, <code>create</code>, <code>drop</code>, or <code>drop-and-create</code>.
      */
-    @Parameter(required = true, defaultValue = "none")
-    private String scriptAction = "none";
+    @Parameter(required = true, defaultValue = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION)
+    private String scriptAction = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION;
 
     public String getScriptAction() {
         return scriptAction;
@@ -167,6 +170,10 @@ public class JpaSchemaGeneratorMojo
         return createOutputFileName;
     }
 
+    public File getCreateOutputFile() {
+        return this.outputDirectory == null ? null : new File(this.outputDirectory, this.createOutputFileName);
+    }
+
     /**
      * generated drop script name
      * <p>
@@ -179,6 +186,10 @@ public class JpaSchemaGeneratorMojo
         return dropOutputFileName;
     }
 
+    public File getDropOutputFile() {
+        return this.outputDirectory == null ? null : new File(this.outputDirectory, this.dropOutputFileName);
+    }
+
     /**
      * specifies whether the creation of database artifacts is to occur on the basis of the object/relational mapping
      * metadata, DDL script, or a combination of the two.
@@ -186,8 +197,8 @@ public class JpaSchemaGeneratorMojo
      * support value is <code>metadata</code>, <code>script</code>, <code>metadata-then-script</code>, or
      * <code>script-then-metadata</code>.
      */
-    @Parameter(defaultValue = "metadata")
-    private String createSourceMode = "metadata";
+    @Parameter(defaultValue = PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE)
+    private String createSourceMode = PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE;
 
     public String getCreateSourceMode() {
         return createSourceMode;
@@ -213,8 +224,8 @@ public class JpaSchemaGeneratorMojo
      * support value is <code>metadata</code>, <code>script</code>, <code>metadata-then-script</code>, or
      * <code>script-then-metadata</code>.
      */
-    @Parameter(defaultValue = "metadata")
-    private String dropSourceMode = "metadata";
+    @Parameter(defaultValue = PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE)
+    private String dropSourceMode = PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE;
 
     public String getDropSourceMode() {
         return dropSourceMode;
@@ -314,8 +325,8 @@ public class JpaSchemaGeneratorMojo
     @Parameter
     private Integer databaseMajorVersion;
 
-    public String getDatabaseMajorVersion() {
-        return databaseMajorVersion == null ? null : String.valueOf(databaseMajorVersion);
+    public Integer getDatabaseMajorVersion() {
+        return databaseMajorVersion;
     }
 
     /**
@@ -330,8 +341,103 @@ public class JpaSchemaGeneratorMojo
     @Parameter
     private Integer databaseMinorVersion;
 
-    public String getDatabaseMinorVersion() {
-        return databaseMinorVersion == null ? null : String.valueOf(databaseMinorVersion);
+    public Integer getDatabaseMinorVersion() {
+        return databaseMinorVersion;
+    }
+
+    private static final URL[] EMPTY_URLS = new URL[0];
+
+    private ClassLoader getProjectClassLoader() throws MojoExecutionException {
+        try {
+            // compiled classes
+            List<String> classfiles = this.project.getCompileClasspathElements();
+            if (this.scanTestClasses) {
+                classfiles.addAll(this.project.getTestClasspathElements());
+            }
+            // classpath to url
+            List<URL> classURLs = new ArrayList<URL>(classfiles.size());
+            for (String classfile : classfiles) {
+                classURLs.add(new File(classfile).toURI().toURL());
+            }
+            return new URLClassLoader(classURLs.toArray(EMPTY_URLS), this.getClass().getClassLoader());
+        } catch (Exception e) {
+            throw new MojoExecutionException("Error while creating classloader", e);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private boolean isDatabaseTarget() {
+        return !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(this.databaseAction);
+    }
+
+    private boolean isScriptTarget() {
+        return !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(this.scriptAction);
+    }
+
+    private void generate() {
+        Map<String, String> map = new HashMap<String, String>();
+
+        /*
+         * Common JPA options
+         */
+        // mode
+        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DATABASE_ACTION, this.databaseAction.toLowerCase());
+        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_ACTION, this.scriptAction.toLowerCase());
+        // output files
+        if (this.isScriptTarget()) {
+            if (this.outputDirectory == null) {
+                throw new NullArgumentException("outputDirectory is required for script generation.");
+            }
+            final File c = new File(this.outputDirectory, this.createOutputFileName);
+            final File d = new File(this.outputDirectory, this.dropOutputFileName);
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_CREATE_TARGET, c.toURI().toString());
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_DROP_TARGET, d.toURI().toString());
+
+        }
+        // database emulation options
+        map.put(PersistenceUnitProperties.SCHEMA_DATABASE_PRODUCT_NAME, this.databaseProductName);
+        map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MAJOR_VERSION,
+                this.databaseMajorVersion == null ? null : String.valueOf(this.databaseMajorVersion));
+        map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MINOR_VERSION,
+                this.databaseMinorVersion == null ? null : String.valueOf(this.databaseMinorVersion));
+        // database options
+        map.put(PersistenceUnitProperties.JDBC_DRIVER, this.jdbcDriver);
+        map.put(PersistenceUnitProperties.JDBC_URL, this.jdbcUrl);
+        map.put(PersistenceUnitProperties.JDBC_USER, this.jdbcUser);
+        map.put(PersistenceUnitProperties.JDBC_PASSWORD, this.jdbcPassword);
+        // source selection
+        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SOURCE, this.createSourceMode);
+        if (this.createSourceFile == null) {
+            if (!PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE.equals(this.createSourceMode)) {
+                throw new IllegalArgumentException("create source file is required for mode "
+                                                   + this.createSourceMode);
+            }
+        } else {
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SCRIPT_SOURCE,
+                    this.createSourceFile.toURI().toString());
+        }
+        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SOURCE, this.dropSourceMode);
+        if (this.dropSourceFile == null) {
+            if (!PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE.equals(this.dropSourceMode)) {
+                throw new IllegalArgumentException("drop source file is required for mode "
+                                                   + this.dropSourceMode);
+            }
+        } else {
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SCRIPT_SOURCE,
+                    this.dropSourceFile.toURI().toString());
+        }
+
+        /*
+         * EclipseLink specific
+         */
+        // persistence.xml
+        map.put(PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML, this.persistenceXml);
+
+        /*
+         * Hibernate specific
+         */
+
+        Persistence.generateSchema(this.persistenceUnitName, map);
     }
 
     @Override
@@ -357,50 +463,19 @@ public class JpaSchemaGeneratorMojo
             }
         }
 
-        final String providerId = this.implementation.toLowerCase().trim();
-        final SchemaGeneratorProvider provider = PROVIDER_MAP.get(providerId);
-        log.info("* Selected provider     : " + providerId + "(" + provider.getClass().toString() + ")");
-
+        // generate schema
+        Thread thread = Thread.currentThread();
+        ClassLoader currentClassLoader = thread.getContextClassLoader();
         try {
-            PROVIDER_MAP.get(providerId).execute(classLoader, this);
+            thread.setContextClassLoader(classLoader);
+            this.generate();
         } catch (Exception e) {
             throw new MojoExecutionException("Error while running", e);
+        } finally {
+            thread.setContextClassLoader(currentClassLoader);
         }
-    }
 
-    private ClassLoader getProjectClassLoader() throws MojoExecutionException {
-        try {
-            // compiled classes
-            List<String> classfiles = this.project.getCompileClasspathElements();
-            if (this.scanTestClasses) {
-                classfiles.addAll(this.project.getTestClasspathElements());
-            }
-            // classpath to url
-            List<URL> classURLs = new ArrayList<URL>(classfiles.size());
-            for (String classfile : classfiles) {
-                classURLs.add(new File(classfile).toURI().toURL());
-            }
-            return new URLClassLoader(classURLs.toArray(EMPTY_URLS), this.getClass().getClassLoader());
-        } catch (Exception e) {
-            throw new MojoExecutionException("Error while creating classloader", e);
-        }
-    }
+        // post-process
 
-    private static final URL[] EMPTY_URLS = new URL[0];
-    private static final Map<String, SchemaGeneratorProvider> PROVIDER_MAP;
-    static {
-        Map<String, SchemaGeneratorProvider> map = new HashMap<String, SchemaGeneratorProvider>();
-        try {
-            registerProvider(map, EclipseLinkProviderImpl.class);
-            PROVIDER_MAP = Collections.unmodifiableMap(map);
-        } catch (Exception e) {
-            throw new RuntimeException("exception while initialize", e);
-        }
-    }
-
-    private static void registerProvider(Map<String, SchemaGeneratorProvider> map,
-                                         Class<? extends SchemaGeneratorProvider> clazz) throws Exception {
-        SchemaGeneratorProvider provider = clazz.newInstance();
-        map.put(provider.providerName(), provider);
     }
 }

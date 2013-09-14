@@ -31,7 +31,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -111,9 +110,9 @@ public class JpaSchemaGeneratorMojoTest
         JpaSchemaGeneratorMojo mojo = this.executeSchemaGeneration(pomfile);
 
         // file check
-        File createScriptFile = new File(mojo.getOutputDirectory(), mojo.getCreateOutputFileName());
+        File createScriptFile = mojo.getCreateOutputFile();
         assertThat("create script should be generated.", createScriptFile.exists(), is(true));
-        File dropScriptFile = new File(mojo.getOutputDirectory(), mojo.getDropOutputFileName());
+        File dropScriptFile = mojo.getDropOutputFile();
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
     }
 
@@ -159,7 +158,6 @@ public class JpaSchemaGeneratorMojoTest
                     ResultSetMetaData metaData = resultSet.getMetaData();
                     assertThat(metaData.getColumnCount(), is(31));
                     assertThat(metaData.getColumnName(1), is("ID"));
-                    assertThat(metaData.getColumnType(1), is(Types.BIGINT));
                     assertThat(metaData.getColumnName(2), is("COLUMN00"));
                 } finally {
                     resultSet.close();
