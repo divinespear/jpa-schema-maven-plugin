@@ -48,6 +48,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
+import org.hibernate.jpa.AvailableSettings;
 
 /**
  * Generate database schema or DDL scripts.
@@ -345,6 +346,14 @@ public class JpaSchemaGeneratorMojo
         return databaseMinorVersion;
     }
 
+    /**
+     * naming strategy that implements {@link org.hibernate.cfg.NamingStrategy}
+     * <p>
+     * Hibernate-only option.
+     */
+    @Parameter
+    private String namingStrategy;
+
     private static final URL[] EMPTY_URLS = new URL[0];
 
     private ClassLoader getProjectClassLoader() throws MojoExecutionException {
@@ -436,6 +445,8 @@ public class JpaSchemaGeneratorMojo
         /*
          * Hibernate specific
          */
+        // naming strategy
+        map.put(AvailableSettings.NAMING_STRATEGY, this.namingStrategy);
 
         Persistence.generateSchema(this.persistenceUnitName, map);
     }
