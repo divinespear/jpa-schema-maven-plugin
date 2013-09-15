@@ -19,13 +19,17 @@ package io.github.divinespear.maven.plugin;
  * under the License.
  */
 
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -110,10 +114,30 @@ public class JpaSchemaGeneratorMojoTest
         JpaSchemaGeneratorMojo mojo = this.executeSchemaGeneration(pomfile);
 
         // file check
+        BufferedReader reader = null;
+
         File createScriptFile = mojo.getCreateOutputFile();
         assertThat("create script should be generated.", createScriptFile.exists(), is(true));
+        reader = new BufferedReader(new InputStreamReader(new FileInputStream(createScriptFile)));
+        try {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                assertThat(line, endsWith(";"));
+            }
+        } finally {
+            reader.close();
+        }
         File dropScriptFile = mojo.getDropOutputFile();
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
+        reader = new BufferedReader(new InputStreamReader(new FileInputStream(dropScriptFile)));
+        try {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                assertThat(line, endsWith(";"));
+            }
+        } finally {
+            reader.close();
+        }
     }
 
     /**

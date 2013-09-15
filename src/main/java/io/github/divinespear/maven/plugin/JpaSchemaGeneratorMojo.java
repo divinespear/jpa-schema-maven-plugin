@@ -19,13 +19,18 @@ package io.github.divinespear.maven.plugin;
  * under the License.
  */
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -451,6 +456,39 @@ public class JpaSchemaGeneratorMojo
         Persistence.generateSchema(this.persistenceUnitName, map);
     }
 
+    private void postProcess() throws IOException {
+        List<File> files = Arrays.asList(this.getCreateOutputFile(), this.getDropOutputFile());
+        for (File file : files) {
+            // check file exists
+            if (file == null || !file.exists()) {
+                continue;
+            }
+            File tempFile = File.createTempFile("script", null, this.getOutputDirectory());
+            try {
+                // move source file to temp file
+                file.renameTo(tempFile);
+                // read/write with eol
+                BufferedReader reader = new BufferedReader(new FileReader(tempFile));
+                PrintWriter writer = new PrintWriter(file);
+                try {
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        if (!line.endsWith(";")) {
+                            line += ";";
+                        }
+                        writer.println(line);
+                    }
+                    writer.flush();
+                } finally {
+                    reader.close();
+                    writer.close();
+                }
+            } finally {
+                tempFile.delete();
+            }
+        }
+    }
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (this.skip) {
@@ -487,6 +525,10 @@ public class JpaSchemaGeneratorMojo
         }
 
         // post-process
-
+        try {
+            this.postProcess();
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error while post-processing script file", e);
+        }
     }
 }
