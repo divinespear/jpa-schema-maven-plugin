@@ -53,6 +53,9 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.dialect.internal.StandardDatabaseInfoDialectResolver;
+import org.hibernate.engine.jdbc.dialect.spi.DatabaseInfoDialectResolver.DatabaseInfo;
 import org.hibernate.jpa.AvailableSettings;
 
 /**
@@ -170,7 +173,7 @@ public class JpaSchemaGeneratorMojo
      * REQUIRED for {@link #scriptAction} is one of <code>create</code>, or <code>drop-and-create</code>.
      */
     @Parameter(defaultValue = "create.sql")
-    private String createOutputFileName;
+    private String createOutputFileName = "create.sql";
 
     public String getCreateOutputFileName() {
         return createOutputFileName;
@@ -186,7 +189,7 @@ public class JpaSchemaGeneratorMojo
      * REQUIRED for {@link #scriptAction} is one of <code>drop</code>, or <code>drop-and-create</code>.
      */
     @Parameter(defaultValue = "drop.sql")
-    private String dropOutputFileName;
+    private String dropOutputFileName = "drop.sql";
 
     public String getDropOutputFileName() {
         return dropOutputFileName;
@@ -354,10 +357,29 @@ public class JpaSchemaGeneratorMojo
     /**
      * naming strategy that implements {@link org.hibernate.cfg.NamingStrategy}
      * <p>
-     * Hibernate-only option.
+     * this is Hibernate-only option.
      */
     @Parameter
     private String namingStrategy;
+
+    public String getNamingStrategy() {
+        return namingStrategy;
+    }
+
+    /**
+     * dialect class
+     * <p>
+     * use this parameter if you want use custom dialect class. default is detect from JDBC connection or using
+     * {@link #databaseProductName}, {@link #databaseMajorVersion}, and {@link #databaseMinorVersion}.
+     * <p>
+     * this is Hibernate-only option.
+     */
+    @Parameter
+    private String dialect;
+
+    public String getDialect() {
+        return dialect;
+    }
 
     private static final URL[] EMPTY_URLS = new URL[0];
 
@@ -388,7 +410,7 @@ public class JpaSchemaGeneratorMojo
         return !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(this.scriptAction);
     }
 
-    private void generate() {
+    private void generate() throws Exception {
         Map<String, String> map = new HashMap<String, String>();
 
         /*
@@ -402,10 +424,10 @@ public class JpaSchemaGeneratorMojo
             if (this.outputDirectory == null) {
                 throw new NullArgumentException("outputDirectory is required for script generation.");
             }
-            final File c = new File(this.outputDirectory, this.createOutputFileName);
-            final File d = new File(this.outputDirectory, this.dropOutputFileName);
-            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_CREATE_TARGET, c.toURI().toString());
-            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_DROP_TARGET, d.toURI().toString());
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_CREATE_TARGET,
+                    this.getCreateOutputFile().toURI().toString());
+            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_DROP_TARGET,
+                    this.getDropOutputFile().toURI().toString());
 
         }
         // database emulation options
@@ -452,6 +474,32 @@ public class JpaSchemaGeneratorMojo
          */
         // naming strategy
         map.put(AvailableSettings.NAMING_STRATEGY, this.namingStrategy);
+        // auto-detect
+        map.put(AvailableSettings.AUTODETECTION, "class,hbm");
+        // dialect (without jdbc connection)
+        if (this.dialect == null && this.jdbcUrl == null) {
+            DatabaseInfo databaseInfo = new DatabaseInfo() {
+                @Override
+                public String getDatabaseName() {
+                    return databaseProductName;
+                }
+
+                @Override
+                public int getDatabaseMajorVersion() {
+                    return databaseMajorVersion;
+                }
+
+                @Override
+                public int getDatabaseMinorVersion() {
+                    return databaseMinorVersion;
+                }
+            };
+            Dialect detectedDialect = new StandardDatabaseInfoDialectResolver().resolve(databaseInfo);
+            this.dialect = detectedDialect.getClass().getName();
+        }
+        if (this.dialect != null) {
+            map.put(org.hibernate.cfg.AvailableSettings.DIALECT, this.dialect);
+        }
 
         Persistence.generateSchema(this.persistenceUnitName, map);
     }

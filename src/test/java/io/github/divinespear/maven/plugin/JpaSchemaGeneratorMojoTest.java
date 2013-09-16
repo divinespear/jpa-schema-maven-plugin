@@ -193,4 +193,43 @@ public class JpaSchemaGeneratorMojoTest
             connection.close();
         }
     }
+
+    /**
+     * Simple schema generation test for script using Hibernate
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGenerateScriptUsingHibernate() throws Exception {
+        final File pomfile = this.getPomFile("target/test-classes/unit/hibernate-simple-script-test");
+
+        this.compileJpaModelSources(pomfile);
+        JpaSchemaGeneratorMojo mojo = this.executeSchemaGeneration(pomfile);
+
+        // file check
+        BufferedReader reader = null;
+
+        File createScriptFile = mojo.getCreateOutputFile();
+        assertThat("create script should be generated.", createScriptFile.exists(), is(true));
+        reader = new BufferedReader(new InputStreamReader(new FileInputStream(createScriptFile)));
+        try {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                assertThat(line, endsWith(";"));
+            }
+        } finally {
+            reader.close();
+        }
+        File dropScriptFile = mojo.getDropOutputFile();
+        assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
+        reader = new BufferedReader(new InputStreamReader(new FileInputStream(dropScriptFile)));
+        try {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                assertThat(line, endsWith(";"));
+            }
+        } finally {
+            reader.close();
+        }
+    }
 }
