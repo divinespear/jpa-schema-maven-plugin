@@ -22,21 +22,25 @@ package io.github.divinespear.maven.plugin;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.anyOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
@@ -76,9 +80,13 @@ public class JpaSchemaGeneratorMojoTest
     }
 
     private void compileJpaModelSources(File pomfile) throws MavenInvocationException {
+        Properties properties = new Properties();
+        properties.setProperty("plugin.version", System.getProperty("plugin.version"));
+
         InvocationRequest request = new DefaultInvocationRequest();
         request.setPomFile(pomfile);
         request.setGoals(Collections.singletonList("compile"));
+        request.setProperties(properties);
 
         Invoker invoker = new DefaultInvoker();
         invoker.execute(request);
@@ -100,6 +108,20 @@ public class JpaSchemaGeneratorMojoTest
         return mojo;
     }
 
+    private List<String> readFileAsList(File file) throws IOException {
+        List<String> list = new ArrayList<String>();
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        try {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                list.add(line);
+            }
+        } finally {
+            reader.close();
+        }
+        return list;
+    }
+
     /**
      * Simple schema generation test for script using EclipseLink
      * 
@@ -114,29 +136,24 @@ public class JpaSchemaGeneratorMojoTest
         JpaSchemaGeneratorMojo mojo = this.executeSchemaGeneration(pomfile);
 
         // file check
-        BufferedReader reader = null;
+        List<String> lines = null;
 
         File createScriptFile = mojo.getCreateOutputFile();
         assertThat("create script should be generated.", createScriptFile.exists(), is(true));
-        reader = new BufferedReader(new InputStreamReader(new FileInputStream(createScriptFile)));
-        try {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                assertThat(line, endsWith(";"));
-            }
-        } finally {
-            reader.close();
+
+        lines = this.readFileAsList(createScriptFile);
+        assertThat(lines.size(), is(3));
+        for (String line : lines) {
+            assertThat(line, endsWith(";"));
         }
+
         File dropScriptFile = mojo.getDropOutputFile();
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
-        reader = new BufferedReader(new InputStreamReader(new FileInputStream(dropScriptFile)));
-        try {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                assertThat(line, endsWith(";"));
-            }
-        } finally {
-            reader.close();
+
+        lines = this.readFileAsList(dropScriptFile);
+        assertThat(lines.size(), is(3));
+        for (String line : lines) {
+            assertThat(line, endsWith(";"));
         }
     }
 
@@ -172,8 +189,8 @@ public class JpaSchemaGeneratorMojoTest
                 try {
                     ResultSetMetaData metaData = resultSet.getMetaData();
                     assertThat(metaData.getColumnCount(), is(2));
-                    assertThat(metaData.getColumnName(1), is("STORED_KEY"));
-                    assertThat(metaData.getColumnName(2), is("STORED_VALUE"));
+                    assertThat(metaData.getColumnName(1), anyOf(is("stored_key"), is("STORED_KEY")));
+                    assertThat(metaData.getColumnName(2), anyOf(is("stored_value"), is("STORED_VALUE")));
                 } finally {
                     resultSet.close();
                 }
@@ -181,8 +198,8 @@ public class JpaSchemaGeneratorMojoTest
                 try {
                     ResultSetMetaData metaData = resultSet.getMetaData();
                     assertThat(metaData.getColumnCount(), is(31));
-                    assertThat(metaData.getColumnName(1), is("ID"));
-                    assertThat(metaData.getColumnName(2), is("COLUMN00"));
+                    assertThat(metaData.getColumnName(1), anyOf(is("id"), is("ID")));
+                    assertThat(metaData.getColumnName(2), anyOf(is("column00"), is("COLUMN00")));
                 } finally {
                     resultSet.close();
                 }
@@ -207,29 +224,78 @@ public class JpaSchemaGeneratorMojoTest
         JpaSchemaGeneratorMojo mojo = this.executeSchemaGeneration(pomfile);
 
         // file check
-        BufferedReader reader = null;
+        List<String> lines = null;
 
         File createScriptFile = mojo.getCreateOutputFile();
         assertThat("create script should be generated.", createScriptFile.exists(), is(true));
-        reader = new BufferedReader(new InputStreamReader(new FileInputStream(createScriptFile)));
-        try {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                assertThat(line, endsWith(";"));
-            }
-        } finally {
-            reader.close();
+
+        lines = this.readFileAsList(createScriptFile);
+        assertThat(lines.size(), is(3));
+        for (String line : lines) {
+            assertThat(line, endsWith(";"));
         }
+
         File dropScriptFile = mojo.getDropOutputFile();
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
-        reader = new BufferedReader(new InputStreamReader(new FileInputStream(dropScriptFile)));
+
+        lines = this.readFileAsList(dropScriptFile);
+        assertThat(lines.size(), is(3));
+        for (String line : lines) {
+            assertThat(line, endsWith(";"));
+        }
+    }
+
+    /**
+     * Simple schema generation test for database using Hibernate
+     * 
+     * @throws Exception
+     *             if any exception raises
+     */
+    @Test
+    public void testGenerateDatabaseUsingHibernate() throws Exception {
+        // delete database if exists
+        File databaseFile = new File(getBasedir(),
+                                     "target/test-classes/unit/hibernate-simple-database-test/target/test.h2.db");
+        if (databaseFile.exists()) {
+            databaseFile.delete();
+        }
+
+        final File pomfile = this.getPomFile("target/test-classes/unit/hibernate-simple-database-test");
+
+        this.compileJpaModelSources(pomfile);
+        JpaSchemaGeneratorMojo mojo = this.executeSchemaGeneration(pomfile);
+
+        // database check
+        Connection connection = DriverManager.getConnection(mojo.getJdbcUrl(),
+                                                            mojo.getJdbcUser(),
+                                                            mojo.getJdbcPassword());
         try {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                assertThat(line, endsWith(";"));
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = null;
+            try {
+                resultSet = statement.executeQuery("SELECT * FROM key_value_store");
+                try {
+                    ResultSetMetaData metaData = resultSet.getMetaData();
+                    assertThat(metaData.getColumnCount(), is(2));
+                    assertThat(metaData.getColumnName(1), anyOf(is("stored_key"), is("STORED_KEY")));
+                    assertThat(metaData.getColumnName(2), anyOf(is("stored_value"), is("STORED_VALUE")));
+                } finally {
+                    resultSet.close();
+                }
+                resultSet = statement.executeQuery("SELECT * FROM many_column_table");
+                try {
+                    ResultSetMetaData metaData = resultSet.getMetaData();
+                    assertThat(metaData.getColumnCount(), is(31));
+                    assertThat(metaData.getColumnName(1), anyOf(is("id"), is("ID")));
+                    assertThat(metaData.getColumnName(2), anyOf(is("column00"), is("COLUMN00")));
+                } finally {
+                    resultSet.close();
+                }
+            } finally {
+                statement.close();
             }
         } finally {
-            reader.close();
+            connection.close();
         }
     }
 }

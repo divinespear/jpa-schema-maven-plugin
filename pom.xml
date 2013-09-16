@@ -240,6 +240,7 @@
 					<systemPropertyVariables>
 						<maven.home>${maven.home}</maven.home>
 					</systemPropertyVariables>
+					<argLine>-Dplugin.version=${project.version}</argLine>
 				</configuration>
 			</plugin>
 			<plugin>

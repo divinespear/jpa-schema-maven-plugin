@@ -48,6 +48,7 @@
 			<plugin>
 				<groupId>io.github.divinespear</groupId>
 				<artifactId>jpa-schema-maven-plugin</artifactId>
+				<version>${plugin.version}</version>
 				<configuration>
 					<outputDirectory>${basedir}/target/test-classes/unit/hibernate-simple-script-test/target/generated-schema</outputDirectory>
 					<namingStrategy>org.hibernate.cfg.ImprovedNamingStrategy</namingStrategy>
