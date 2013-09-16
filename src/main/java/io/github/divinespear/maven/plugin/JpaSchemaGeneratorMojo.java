@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.persistence.Persistence;
 
@@ -504,6 +505,8 @@ public class JpaSchemaGeneratorMojo
         Persistence.generateSchema(this.persistenceUnitName, map);
     }
 
+    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("(create|drop)", Pattern.CASE_INSENSITIVE);
+
     private void postProcess() throws IOException {
         List<File> files = Arrays.asList(this.getCreateOutputFile(), this.getDropOutputFile());
         for (File file : files) {
@@ -521,10 +524,17 @@ public class JpaSchemaGeneratorMojo
                 try {
                     String line = null;
                     while ((line = reader.readLine()) != null) {
-                        if (!line.endsWith(";")) {
-                            line += ";";
+                        line = CREATE_DROP_PATTERN.matcher(line).replaceAll(";$1");
+                        for (String s : line.split(";")) {
+                            if (StringUtils.isBlank(s)) {
+                                continue;
+                            }
+                            s = s.trim();
+                            if (!s.endsWith(";")) {
+                                s += ";";
+                            }
+                            writer.println(s);
                         }
-                        writer.println(line);
                     }
                     writer.flush();
                 } finally {
