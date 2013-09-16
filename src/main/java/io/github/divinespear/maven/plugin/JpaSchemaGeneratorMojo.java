@@ -58,6 +58,7 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.dialect.internal.StandardDatabaseInfoDialectResolver;
 import org.hibernate.engine.jdbc.dialect.spi.DatabaseInfoDialectResolver.DatabaseInfo;
 import org.hibernate.jpa.AvailableSettings;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 /**
  * Generate database schema or DDL scripts.
@@ -110,8 +111,8 @@ public class JpaSchemaGeneratorMojo
     /**
      * location of <code>persistence.xml</code> file
      * <p>
-     * Note for Hibernate: <b>current version (4.3.0.beta3) DOES NOT SUPPORT custom location.</b> so your configuration
-     * will be ignored.
+     * Note for Hibernate: <b>current version (4.3.0.beta3) DOES NOT SUPPORT custom location.</b> ({@link SchemaExport}
+     * support it, but JPA 2.1 schema generator does NOT.)
      */
     @Parameter(required = true, defaultValue = PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML_DEFAULT)
     private String persistenceXml = PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML_DEFAULT;
@@ -134,7 +135,9 @@ public class JpaSchemaGeneratorMojo
      * schema generation action for database
      * <p>
      * support value is <code>none</code>, <code>create</code>, <code>drop</code>, <code>drop-and-create</code>, or
-     * <code>create-or-extend-tables</code> (EclipseLink only).
+     * <code>create-or-extend-tables</code>.
+     * <p>
+     * <code>create-or-extend-tables</code> only support for EclipseLink with database target.
      */
     @Parameter(required = true, defaultValue = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION)
     private String databaseAction = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION;

@@ -47,7 +47,7 @@ or use default lifecycle
 
 	mvn process-classes
 
-To see configuration parameters, see [here](http://divinespear.github.io/jpa-schema-maven-plugin/generate-mojo.html).
+To see configuration parameters, see [here](generate-mojo.html).
 
 
 License
