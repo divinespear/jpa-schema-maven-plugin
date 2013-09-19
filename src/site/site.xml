@@ -12,7 +12,7 @@
 			<topBarEnabled>false</topBarEnabled>
 			<sideBarEnabled>true</sideBarEnabled>
 			<gitHub>
-				<projectId>divinespear/jpa-ddl-maven-plugin</projectId>
+				<projectId>divinespear/jpa-schema-maven-plugin</projectId>
 				<ribbonOrientation>right</ribbonOrientation>
 				<ribbonColor>black</ribbonColor>
 			</gitHub>

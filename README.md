@@ -3,7 +3,7 @@ jpa-schema-maven-plugin
 
 [![Build Status](https://secure.travis-ci.org/divinespear/jpa-schema-maven-plugin.png)](http://travis-ci.org/divinespear/jpa-schema-maven-plugin)
 
-Maven plugin for generate schema or DDL scripts from JPA entities using [JPA 2.1](http://jcp.org/en/jsr/detail?id=338) schema generation support.
+Maven plugin for generate schema or DDL scripts from JPA entities using [JPA 2.1](http://jcp.org/en/jsr/detail?id=338) schema generator.
 
 Currently support [EclipseLink](http://www.eclipse.org/eclipselink) (Reference Implementation) and [Hibernate](http://hibernate.org).
 
