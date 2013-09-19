@@ -1,5 +1,9 @@
 language: java
 script: "mvn deploy -Dmaven.install.skip=true --settings src/travis-ci/settings.xml"
+branches:
+  only:
+    - master
+    - /^issue-.*$/
 jdk:
   - openjdk6
 env:
