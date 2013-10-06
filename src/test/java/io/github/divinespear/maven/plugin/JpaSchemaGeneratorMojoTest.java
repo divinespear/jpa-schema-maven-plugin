@@ -188,9 +188,10 @@ public class JpaSchemaGeneratorMojoTest
                 resultSet = statement.executeQuery("SELECT * FROM KEY_VALUE_STORE");
                 try {
                     ResultSetMetaData metaData = resultSet.getMetaData();
-                    assertThat(metaData.getColumnCount(), is(2));
+                    assertThat(metaData.getColumnCount(), is(3));
                     assertThat(metaData.getColumnName(1), anyOf(is("stored_key"), is("STORED_KEY")));
-                    assertThat(metaData.getColumnName(2), anyOf(is("stored_value"), is("STORED_VALUE")));
+                    assertThat(metaData.getColumnName(2), anyOf(is("created_at"), is("CREATED_AT")));
+                    assertThat(metaData.getColumnName(3), anyOf(is("stored_value"), is("STORED_VALUE")));
                 } finally {
                     resultSet.close();
                 }
@@ -276,9 +277,10 @@ public class JpaSchemaGeneratorMojoTest
                 resultSet = statement.executeQuery("SELECT * FROM key_value_store");
                 try {
                     ResultSetMetaData metaData = resultSet.getMetaData();
-                    assertThat(metaData.getColumnCount(), is(2));
+                    assertThat(metaData.getColumnCount(), is(3));
                     assertThat(metaData.getColumnName(1), anyOf(is("stored_key"), is("STORED_KEY")));
-                    assertThat(metaData.getColumnName(2), anyOf(is("stored_value"), is("STORED_VALUE")));
+                    assertThat(metaData.getColumnName(2), anyOf(is("created_at"), is("CREATED_AT")));
+                    assertThat(metaData.getColumnName(3), anyOf(is("stored_value"), is("STORED_VALUE")));
                 } finally {
                     resultSet.close();
                 }

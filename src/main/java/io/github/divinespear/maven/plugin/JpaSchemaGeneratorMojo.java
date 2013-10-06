@@ -508,7 +508,7 @@ public class JpaSchemaGeneratorMojo
         Persistence.generateSchema(this.persistenceUnitName, map);
     }
 
-    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("(create|drop)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("((?:create|drop)\\s+(?:table|view|sequence))", Pattern.CASE_INSENSITIVE);
 
     private void postProcess() throws IOException {
         List<File> files = Arrays.asList(this.getCreateOutputFile(), this.getDropOutputFile());
