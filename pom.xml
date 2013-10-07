@@ -128,6 +128,11 @@
 			<version>${version-org.eclipse.persistence}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.oracle</artifactId>
+			<version>${version-org.eclipse.persistence}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${version-org.hibernate}</version>
