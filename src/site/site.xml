@@ -21,14 +21,14 @@
 	<publishDate position="right"/>
 	<version position="right"/>
 	<body>
+		<breadcrumbs>
+			<item name="Home" href="" />
+		</breadcrumbs>
 		<menu ref="modules" />
 		<menu ref="reports" />
 		<menu name="Links">
 			<item name="EclipseLink" href="http://www.eclipse.org/eclipselink" />
 			<item name="Hibernate" href="http://www.hibernate.org" />
 		</menu>
-		<breadcrumbs>
-			<item name="Home" href="" />
-		</breadcrumbs>
 	</body>
 </project>
