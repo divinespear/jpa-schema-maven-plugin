@@ -41,6 +41,10 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -82,6 +86,9 @@ public class JpaSchemaGeneratorMojo
 
     @Component
     private MojoExecution mojo;
+
+    @Component
+    private ArtifactResolver resolver;
 
     // for Maven 3 only
     @Component
@@ -401,18 +408,35 @@ public class JpaSchemaGeneratorMojo
             for (String classfile : classfiles) {
                 classURLs.add(new File(classfile).toURI().toURL());
             }
+
             // dependency artifacts to url
-            Set<Artifact> artifacts = this.project.getArtifacts();
+            ArtifactResolutionRequest sharedreq = new ArtifactResolutionRequest().setResolveRoot(true)
+                                                                                 .setResolveTransitively(true)
+                                                                                 .setLocalRepository(this.session.getLocalRepository())
+                                                                                 .setRemoteRepositories(this.project.getRemoteArtifactRepositories());
+
+            ArtifactRepository repository = this.session.getLocalRepository();
+            Set<Artifact> artifacts = this.project.getDependencyArtifacts();
             for (Artifact artifact : artifacts) {
                 if (!Artifact.SCOPE_TEST.equalsIgnoreCase(artifact.getScope())) {
-                    File file = artifact.getFile();
-                    if (file != null) {
-                        classURLs.add(file.toURI().toURL());
+                    ArtifactResolutionRequest request = new ArtifactResolutionRequest(sharedreq).setArtifact(artifact);
+                    ArtifactResolutionResult result = this.resolver.resolve(request);
+                    if (result.isSuccess()) {
+                        File file = repository.find(artifact).getFile();
+                        if (file != null) {
+                            classURLs.add(file.toURI().toURL());
+                        }
                     }
                 }
             }
+
+            for (URL url : classURLs) {
+                this.log.info("  * classpath: " + url);
+            }
+
             return new URLClassLoader(classURLs.toArray(EMPTY_URLS), this.getClass().getClassLoader());
         } catch (Exception e) {
+            this.log.error(e);
             throw new MojoExecutionException("Error while creating classloader", e);
         }
     }

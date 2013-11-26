@@ -102,6 +102,8 @@ public class JpaSchemaGeneratorMojoTest
         doReturn(Arrays.asList(parent + "/target/classes")).when(projectMock)
                                                            .getCompileClasspathElements();
         setVariableValueToObject(mojo, "project", projectMock);
+        // configure project session
+        setVariableValueToObject(mojo, "session", newMavenSession(projectMock));
         // execute
         mojo.execute();
 
