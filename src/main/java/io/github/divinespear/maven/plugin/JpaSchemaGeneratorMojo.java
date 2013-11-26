@@ -34,11 +34,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.persistence.Persistence;
 
 import org.apache.commons.lang.NullArgumentException;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -399,6 +401,16 @@ public class JpaSchemaGeneratorMojo
             for (String classfile : classfiles) {
                 classURLs.add(new File(classfile).toURI().toURL());
             }
+            // dependency artifacts to url
+            Set<Artifact> artifacts = this.project.getArtifacts();
+            for (Artifact artifact : artifacts) {
+                if (!Artifact.SCOPE_TEST.equalsIgnoreCase(artifact.getScope())) {
+                    File file = artifact.getFile();
+                    if (file != null) {
+                        classURLs.add(file.toURI().toURL());
+                    }
+                }
+            }
             return new URLClassLoader(classURLs.toArray(EMPTY_URLS), this.getClass().getClassLoader());
         } catch (Exception e) {
             throw new MojoExecutionException("Error while creating classloader", e);
@@ -508,7 +520,8 @@ public class JpaSchemaGeneratorMojo
         Persistence.generateSchema(this.persistenceUnitName, map);
     }
 
-    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("((?:create|drop|alter)\\s+(?:table|view|sequence))", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("((?:create|drop|alter)\\s+(?:table|view|sequence))",
+                                                                       Pattern.CASE_INSENSITIVE);
 
     private void postProcess() throws IOException {
         List<File> files = Arrays.asList(this.getCreateOutputFile(), this.getDropOutputFile());
