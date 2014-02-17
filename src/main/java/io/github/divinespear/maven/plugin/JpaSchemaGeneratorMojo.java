@@ -562,9 +562,7 @@ public class JpaSchemaGeneratorMojo
                 try {
                     String line = null;
                     while ((line = reader.readLine()) != null) {
-                        log.debug("before: " + line);
                         line = CREATE_DROP_PATTERN.matcher(line).replaceAll(";$1");
-                        log.debug("after : " + line);
                         for (String s : line.split(";")) {
                             if (StringUtils.isBlank(s)) {
                                 continue;
@@ -573,7 +571,6 @@ public class JpaSchemaGeneratorMojo
                             if (!s.endsWith(";")) {
                                 s += ";";
                             }
-                            log.debug("write as: " + s);
                             writer.println(s);
                         }
                     }
@@ -583,7 +580,6 @@ public class JpaSchemaGeneratorMojo
                     writer.close();
                 }
             } finally {
-                // tempFile.delete();
                 file.delete();
                 tempFile.renameTo(file);
             }
