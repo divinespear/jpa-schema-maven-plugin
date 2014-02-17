@@ -584,7 +584,7 @@ public class JpaSchemaGeneratorMojo
                 }
             } finally {
                 // tempFile.delete();
-                // file.delete();
+                file.delete();
                 tempFile.renameTo(file);
             }
         }
