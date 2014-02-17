@@ -544,7 +544,7 @@ public class JpaSchemaGeneratorMojo
         Persistence.generateSchema(this.persistenceUnitName, map);
     }
 
-    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("((?:create|drop|alter)\\s+(?:table|view|sequence))",
+    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("((?:create|drop|alter)\\s+(?:table|view|sequence)|\\r?\\n)",
                                                                        Pattern.CASE_INSENSITIVE);
 
     private void postProcess() throws IOException {
@@ -562,6 +562,7 @@ public class JpaSchemaGeneratorMojo
                 try {
                     String line = null;
                     while ((line = reader.readLine()) != null) {
+                        log.debug(line);
                         line = CREATE_DROP_PATTERN.matcher(line).replaceAll(";$1");
                         for (String s : line.split(";")) {
                             if (StringUtils.isBlank(s)) {
