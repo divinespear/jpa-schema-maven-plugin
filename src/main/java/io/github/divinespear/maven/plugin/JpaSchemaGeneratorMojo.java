@@ -544,7 +544,7 @@ public class JpaSchemaGeneratorMojo
         Persistence.generateSchema(this.persistenceUnitName, map);
     }
 
-    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("((?:create|drop|alter)\\s+(?:table|view|sequence))",
+    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("((?:create|drop|alter)\\s+(?:table|view|sequence)|\\r?\\n)",
                                                                        Pattern.CASE_INSENSITIVE);
 
     private void postProcess() throws IOException {
@@ -556,11 +556,9 @@ public class JpaSchemaGeneratorMojo
             }
             File tempFile = File.createTempFile("script", null, this.getOutputDirectory());
             try {
-                // move source file to temp file
-                file.renameTo(tempFile);
                 // read/write with eol
-                BufferedReader reader = new BufferedReader(new FileReader(tempFile));
-                PrintWriter writer = new PrintWriter(file);
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                PrintWriter writer = new PrintWriter(tempFile);
                 try {
                     String line = null;
                     while ((line = reader.readLine()) != null) {
@@ -582,7 +580,8 @@ public class JpaSchemaGeneratorMojo
                     writer.close();
                 }
             } finally {
-                tempFile.delete();
+                file.delete();
+                tempFile.renameTo(file);
             }
         }
     }
