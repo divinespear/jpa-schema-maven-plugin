@@ -544,7 +544,7 @@ public class JpaSchemaGeneratorMojo
         Persistence.generateSchema(this.persistenceUnitName, map);
     }
 
-    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("((?:create|drop|alter)\\s+(?:table|view|sequence)|\\r?\\n)",
+    private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("((?:create|drop|alter)\\s+(?:table|view|sequence))",
                                                                        Pattern.CASE_INSENSITIVE);
 
     private void postProcess() throws IOException {
