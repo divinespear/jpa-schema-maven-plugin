@@ -124,6 +124,20 @@ public class JpaSchemaGeneratorMojoTest
         return list;
     }
 
+    private String readFileAsText(File file) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        try {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line).append("\r\n");
+            }
+        } finally {
+            reader.close();
+        }
+        return builder.toString();
+    }
+
     /**
      * Simple schema generation test for script using EclipseLink
      * 
@@ -148,6 +162,78 @@ public class JpaSchemaGeneratorMojoTest
         for (String line : lines) {
             assertThat(line, endsWith(";"));
         }
+
+        File dropScriptFile = mojo.getDropOutputFile();
+        assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
+
+        lines = this.readFileAsList(dropScriptFile);
+        assertThat(lines.size(), is(3));
+        for (String line : lines) {
+            assertThat(line, endsWith(";"));
+        }
+    }
+
+    /**
+     * Simple schema generation test for script using EclipseLink
+     * 
+     * @throws Exception
+     *             if any exception raises
+     */
+    @Test
+    public void testGenerateScriptUsingEclipseLinkFormatted() throws Exception {
+        final File pomfile = this.getPomFile("target/test-classes/unit/eclipselink-formatted-script-test");
+
+        this.compileJpaModelSources(pomfile);
+        JpaSchemaGeneratorMojo mojo = this.executeSchemaGeneration(pomfile);
+
+        // file check
+        List<String> lines = null;
+
+        File createScriptFile = mojo.getCreateOutputFile();
+        assertThat("create script should be generated.", createScriptFile.exists(), is(true));
+
+        final String expectCreate = "CREATE TABLE KEY_VALUE_STORE (\r\n"
+                                    + "\tSTORED_KEY VARCHAR(128) NOT NULL,\r\n"
+                                    + "\tCREATED_AT TIMESTAMP,\r\n"
+                                    + "\tSTORED_VALUE VARCHAR(32768),\r\n"
+                                    + "\tPRIMARY KEY (STORED_KEY)\r\n"
+                                    + ");\r\n"
+                                    + "CREATE TABLE MANY_COLUMN_TABLE (\r\n"
+                                    + "\tID BIGINT NOT NULL,\r\n"
+                                    + "\tCOLUMN00 VARCHAR,\r\n"
+                                    + "\tCOLUMN01 VARCHAR,\r\n"
+                                    + "\tCOLUMN02 VARCHAR,\r\n"
+                                    + "\tCOLUMN03 VARCHAR,\r\n"
+                                    + "\tCOLUMN04 VARCHAR,\r\n"
+                                    + "\tCOLUMN05 VARCHAR,\r\n"
+                                    + "\tCOLUMN06 VARCHAR,\r\n"
+                                    + "\tCOLUMN07 VARCHAR,\r\n"
+                                    + "\tCOLUMN08 VARCHAR,\r\n"
+                                    + "\tCOLUMN09 VARCHAR,\r\n"
+                                    + "\tCOLUMN10 VARCHAR,\r\n"
+                                    + "\tCOLUMN11 VARCHAR,\r\n"
+                                    + "\tCOLUMN12 VARCHAR,\r\n"
+                                    + "\tCOLUMN13 VARCHAR,\r\n"
+                                    + "\tCOLUMN14 VARCHAR,\r\n"
+                                    + "\tCOLUMN15 VARCHAR,\r\n"
+                                    + "\tCOLUMN16 VARCHAR,\r\n"
+                                    + "\tCOLUMN17 VARCHAR,\r\n"
+                                    + "\tCOLUMN18 VARCHAR,\r\n"
+                                    + "\tCOLUMN19 VARCHAR,\r\n"
+                                    + "\tCOLUMN20 VARCHAR,\r\n"
+                                    + "\tCOLUMN21 VARCHAR,\r\n"
+                                    + "\tCOLUMN22 VARCHAR,\r\n"
+                                    + "\tCOLUMN23 VARCHAR,\r\n"
+                                    + "\tCOLUMN24 VARCHAR,\r\n"
+                                    + "\tCOLUMN25 VARCHAR,\r\n"
+                                    + "\tCOLUMN26 VARCHAR,\r\n"
+                                    + "\tCOLUMN27 VARCHAR,\r\n"
+                                    + "\tCOLUMN28 VARCHAR,\r\n"
+                                    + "\tCOLUMN29 VARCHAR,\r\n"
+                                    + "\tPRIMARY KEY (ID)\r\n"
+                                    + ");\r\n"
+                                    + "CREATE SEQUENCE SEQ_GEN_SEQUENCE INCREMENT BY 50 START WITH 50;\r\n";
+        assertThat(this.readFileAsText(createScriptFile), is(expectCreate));
 
         File dropScriptFile = mojo.getDropOutputFile();
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
@@ -234,6 +320,40 @@ public class JpaSchemaGeneratorMojoTest
 
         lines = this.readFileAsList(createScriptFile);
         assertThat(lines.size(), is(3));
+        for (String line : lines) {
+            assertThat(line, endsWith(";"));
+        }
+
+        File dropScriptFile = mojo.getDropOutputFile();
+        assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
+
+        lines = this.readFileAsList(dropScriptFile);
+        assertThat(lines.size(), is(3));
+        for (String line : lines) {
+            assertThat(line, endsWith(";"));
+        }
+    }
+
+    /**
+     * Simple schema generation test for script using Hibernate
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGenerateScriptUsingHibernateFormatted() throws Exception {
+        final File pomfile = this.getPomFile("target/test-classes/unit/hibernate-formatted-script-test");
+
+        this.compileJpaModelSources(pomfile);
+        JpaSchemaGeneratorMojo mojo = this.executeSchemaGeneration(pomfile);
+
+        // file check
+        List<String> lines = null;
+
+        File createScriptFile = mojo.getCreateOutputFile();
+        assertThat("create script should be generated.", createScriptFile.exists(), is(true));
+
+        lines = this.readFileAsList(createScriptFile);
+        assertThat(lines.size(), is(41));
         for (String line : lines) {
             assertThat(line, endsWith(";"));
         }
