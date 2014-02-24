@@ -108,6 +108,16 @@ public class JpaSchemaGeneratorMojo
     }
 
     /**
+     * generate as formatted
+     */
+    @Parameter(property = "jpa-schema.generate.format", required = true, defaultValue = "false")
+    private boolean format = false;
+
+    public boolean isFormat() {
+        return format;
+    }
+
+    /**
      * scan test classes
      */
     @Parameter(property = "jpa-schema.generate.scan-test-classes", required = true, defaultValue = "false")
@@ -571,7 +581,7 @@ public class JpaSchemaGeneratorMojo
                             if (!s.endsWith(";")) {
                                 s += ";";
                             }
-                            writer.println(s);
+                            writer.println(this.isFormat() ? format(s) : s);
                         }
                     }
                     writer.flush();
@@ -584,6 +594,12 @@ public class JpaSchemaGeneratorMojo
                 tempFile.renameTo(file);
             }
         }
+    }
+
+    private String format(String s) {
+        return s.replaceAll("^([^(]+\\()", "$1\r\n\t")
+                .replaceAll("\\)[^()]*$", "\r\n$0")
+                .replaceAll("((?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),)\\s*", "$1\r\n\t");
     }
 
     @Override
