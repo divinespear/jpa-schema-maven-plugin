@@ -61,8 +61,8 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.jdbc.dialect.internal.StandardDatabaseInfoDialectResolver;
-import org.hibernate.engine.jdbc.dialect.spi.DatabaseInfoDialectResolver.DatabaseInfo;
+import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
+import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
 import org.hibernate.jpa.AvailableSettings;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
@@ -528,23 +528,38 @@ public class JpaSchemaGeneratorMojo
         map.put(AvailableSettings.AUTODETECTION, "class,hbm");
         // dialect (without jdbc connection)
         if (this.dialect == null && this.jdbcUrl == null) {
-            DatabaseInfo databaseInfo = new DatabaseInfo() {
+            DialectResolutionInfo info = new DialectResolutionInfo() {
+                @Override
+                public String getDriverName() {
+                    return null;
+                }
+
+                @Override
+                public int getDriverMinorVersion() {
+                    return 0;
+                }
+
+                @Override
+                public int getDriverMajorVersion() {
+                    return 0;
+                }
+
                 @Override
                 public String getDatabaseName() {
                     return databaseProductName;
                 }
 
                 @Override
-                public int getDatabaseMajorVersion() {
-                    return databaseMajorVersion;
-                }
-
-                @Override
                 public int getDatabaseMinorVersion() {
                     return databaseMinorVersion;
                 }
+
+                @Override
+                public int getDatabaseMajorVersion() {
+                    return databaseMajorVersion;
+                }
             };
-            Dialect detectedDialect = new StandardDatabaseInfoDialectResolver().resolve(databaseInfo);
+            Dialect detectedDialect = StandardDialectResolver.INSTANCE.resolveDialect(info);
             this.dialect = detectedDialect.getClass().getName();
         }
         if (this.dialect != null) {
