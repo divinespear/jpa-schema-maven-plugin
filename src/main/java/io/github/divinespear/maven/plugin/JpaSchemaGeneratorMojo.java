@@ -1,5 +1,3 @@
-package io.github.divinespear.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,8 @@ package io.github.divinespear.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+package io.github.divinespear.maven.plugin;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -61,8 +61,8 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.jdbc.dialect.internal.StandardDatabaseInfoDialectResolver;
-import org.hibernate.engine.jdbc.dialect.spi.DatabaseInfoDialectResolver.DatabaseInfo;
+import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
+import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
 import org.hibernate.jpa.AvailableSettings;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
@@ -451,7 +451,6 @@ public class JpaSchemaGeneratorMojo
         }
     }
 
-    @SuppressWarnings("unused")
     private boolean isDatabaseTarget() {
         return !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(this.databaseAction);
     }
@@ -461,7 +460,7 @@ public class JpaSchemaGeneratorMojo
     }
 
     private void generate() throws Exception {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, Object> map = new HashMap<String, Object>();
 
         /*
          * Common JPA options
@@ -528,27 +527,48 @@ public class JpaSchemaGeneratorMojo
         map.put(AvailableSettings.AUTODETECTION, "class,hbm");
         // dialect (without jdbc connection)
         if (this.dialect == null && this.jdbcUrl == null) {
-            DatabaseInfo databaseInfo = new DatabaseInfo() {
+            DialectResolutionInfo info = new DialectResolutionInfo() {
+                @Override
+                public String getDriverName() {
+                    return null;
+                }
+
+                @Override
+                public int getDriverMinorVersion() {
+                    return 0;
+                }
+
+                @Override
+                public int getDriverMajorVersion() {
+                    return 0;
+                }
+
                 @Override
                 public String getDatabaseName() {
                     return databaseProductName;
                 }
 
                 @Override
-                public int getDatabaseMajorVersion() {
-                    return databaseMajorVersion;
-                }
-
-                @Override
                 public int getDatabaseMinorVersion() {
                     return databaseMinorVersion;
                 }
+
+                @Override
+                public int getDatabaseMajorVersion() {
+                    return databaseMajorVersion;
+                }
             };
-            Dialect detectedDialect = new StandardDatabaseInfoDialectResolver().resolve(databaseInfo);
+            Dialect detectedDialect = StandardDialectResolver.INSTANCE.resolveDialect(info);
             this.dialect = detectedDialect.getClass().getName();
         }
         if (this.dialect != null) {
             map.put(org.hibernate.cfg.AvailableSettings.DIALECT, this.dialect);
+        }
+        if (!this.isDatabaseTarget() && StringUtils.isEmpty(this.jdbcUrl)) {
+            map.put(AvailableSettings.SCHEMA_GEN_CONNECTION,
+                    new ConnectionMock(this.getDatabaseProductName(),
+                                       this.getDatabaseMajorVersion(),
+                                       this.getDatabaseMinorVersion()));
         }
 
         Persistence.generateSchema(this.persistenceUnitName, map);
