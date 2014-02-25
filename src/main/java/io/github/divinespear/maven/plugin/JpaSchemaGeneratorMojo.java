@@ -1,5 +1,3 @@
-package io.github.divinespear.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,8 @@ package io.github.divinespear.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+package io.github.divinespear.maven.plugin;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -451,7 +451,6 @@ public class JpaSchemaGeneratorMojo
         }
     }
 
-    @SuppressWarnings("unused")
     private boolean isDatabaseTarget() {
         return !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(this.databaseAction);
     }
@@ -461,7 +460,7 @@ public class JpaSchemaGeneratorMojo
     }
 
     private void generate() throws Exception {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, Object> map = new HashMap<String, Object>();
 
         /*
          * Common JPA options
@@ -564,6 +563,12 @@ public class JpaSchemaGeneratorMojo
         }
         if (this.dialect != null) {
             map.put(org.hibernate.cfg.AvailableSettings.DIALECT, this.dialect);
+        }
+        if (!this.isDatabaseTarget() && StringUtils.isEmpty(this.jdbcUrl)) {
+            map.put(AvailableSettings.SCHEMA_GEN_CONNECTION,
+                    new ConnectionMock(this.getDatabaseProductName(),
+                                       this.getDatabaseMajorVersion(),
+                                       this.getDatabaseMinorVersion()));
         }
 
         Persistence.generateSchema(this.persistenceUnitName, map);
