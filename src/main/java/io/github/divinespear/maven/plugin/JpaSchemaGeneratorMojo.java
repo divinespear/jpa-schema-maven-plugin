@@ -130,7 +130,7 @@ public class JpaSchemaGeneratorMojo
     /**
      * location of <code>persistence.xml</code> file
      * <p>
-     * Note for Hibernate: <b>current version (4.3.0.beta3) DOES NOT SUPPORT custom location.</b> ({@link SchemaExport}
+     * Note for Hibernate: <b>current version (4.3.1.Final) DOES NOT SUPPORT custom location.</b> ({@link SchemaExport}
      * support it, but JPA 2.1 schema generator does NOT.)
      */
     @Parameter(required = true, defaultValue = PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML_DEFAULT)
