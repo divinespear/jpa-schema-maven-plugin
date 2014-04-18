@@ -20,7 +20,7 @@ Define plugin at your maven `pom.xml` file like below.
 				<plugin>
 					<groupId>io.github.divinespear</groupId>
 					<artifactId>jpa-schema-maven-plugin</artifactId>
-					<version>0.1.8</version>
+					<version>0.1.9</version>
 					<configuration>
 						...
 					</configuration>
