@@ -616,10 +616,39 @@ public class JpaSchemaGeneratorMojo
         }
     }
 
-    private String format(String s) {
-        return s.replaceAll("^([^(]+\\()", "$1\r\n\t")
-                .replaceAll("\\)[^()]*$", "\r\n$0")
-                .replaceAll("((?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),)\\s*", "$1\r\n\t");
+    String format(String s) {
+        s = s.replaceAll("^([^(]+\\()", "$1\r\n\t")
+             .replaceAll("\\)[^()]*$", "\r\n$0")
+             .replaceAll("((?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),)\\s*", "$1\r\n\t");
+        StringBuilder builder = new StringBuilder();
+        boolean completed = true;
+        if (Pattern.compile("(?i)^create\\s+(?:table|view)").matcher(s).find()) {
+            for (String it : s.split("\r\n")) {
+                if (it.matches("^\\S.*$")) {
+                    if (!completed) {
+                        builder.append("\r\n");
+                        completed = true;
+                    }
+                    builder.append(it).append("\r\n");
+                } else if (completed) {
+                    if (it.matches("^\\s*[^(]+(?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),\\s*$")) {
+                        builder.append(it).append("\r\n");
+                    } else {
+                        builder.append(it);
+                        completed = false;
+                    }
+                } else {
+                    builder.append(it.trim());
+                    if (it.matches("[^)]+\\).*$")) {
+                        builder.append("\r\n");
+                        completed = true;
+                    }
+                }
+            }
+        } else {
+            builder.append(s);
+        }
+        return builder.toString().trim();
     }
 
     @Override
