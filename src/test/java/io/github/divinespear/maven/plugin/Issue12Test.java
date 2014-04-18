@@ -23,4 +23,23 @@ public class Issue12Test {
         JpaSchemaGeneratorMojo mojo = new JpaSchemaGeneratorMojo();
         assertThat(mojo.format(from), is(expected));
     }
+
+    @Test
+    public void shouldFormatCreateIndex() {
+        String from = "CREATE INDEX INDEX_USER_ACCOUNT_ENABLED_DELETED ON USER_ACCOUNT (ENABLED,DELETED);";
+        String expected = "CREATE INDEX INDEX_USER_ACCOUNT_ENABLED_DELETED\r\n"
+                          + "\tON USER_ACCOUNT (ENABLED,DELETED);";
+        JpaSchemaGeneratorMojo mojo = new JpaSchemaGeneratorMojo();
+        assertThat(mojo.format(from), is(expected));
+    }
+
+    @Test
+    public void shouldFormatAlterTable() {
+        String from = "ALTER TABLE PRODUCT_CATEGORY ADD CONSTRAINT PRODUCTCATEGORYPRENTID FOREIGN KEY (PARENT_ID) REFERENCES PRODUCT_CATEGORY (ID);";
+        String expected = "ALTER TABLE PRODUCT_CATEGORY\r\n"
+                          + "\tADD CONSTRAINT PRODUCTCATEGORYPRENTID FOREIGN KEY (PARENT_ID)\r\n"
+                          + "\tREFERENCES PRODUCT_CATEGORY (ID);";
+        JpaSchemaGeneratorMojo mojo = new JpaSchemaGeneratorMojo();
+        assertThat(mojo.format(from), is(expected));
+    }
 }

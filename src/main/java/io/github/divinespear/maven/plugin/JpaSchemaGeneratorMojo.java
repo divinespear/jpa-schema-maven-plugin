@@ -616,19 +616,63 @@ public class JpaSchemaGeneratorMojo
         }
     }
 
+    private static final Pattern
+            PATTERN_CREATE_TABLE = Pattern.compile("(?i)^create\\s+(?:table|view)"),
+            PATTERN_CREATE_INDEX = Pattern.compile("(?i)^create\\s+index"),
+            PATTERN_ALTER_TABLE = Pattern.compile("(?i)^alter\\s+table");
+
     String format(String s) {
         s = s.replaceAll("^([^(]+\\()", "$1\r\n\t")
              .replaceAll("\\)[^()]*$", "\r\n$0")
              .replaceAll("((?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),)\\s*", "$1\r\n\t");
         StringBuilder builder = new StringBuilder();
         boolean completed = true;
-        if (Pattern.compile("(?i)^create\\s+(?:table|view)").matcher(s).find()) {
+        if (PATTERN_CREATE_TABLE.matcher(s).find()) {
             for (String it : s.split("\r\n")) {
                 if (it.matches("^\\S.*$")) {
                     if (!completed) {
                         builder.append("\r\n");
                         completed = true;
                     }
+                    builder.append(it).append("\r\n");
+                } else if (completed) {
+                    if (it.matches("^\\s*[^(]+(?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),\\s*$")) {
+                        builder.append(it).append("\r\n");
+                    } else {
+                        builder.append(it);
+                        completed = false;
+                    }
+                } else {
+                    builder.append(it.trim());
+                    if (it.matches("[^)]+\\).*$")) {
+                        builder.append("\r\n");
+                        completed = true;
+                    }
+                }
+            }
+        } else if (PATTERN_CREATE_INDEX.matcher(s).find()) {
+            for (String it : s.replaceAll("(?i)^(create\\s+index\\s+\\S+)\\s*", "$1\r\n\t").split("\r\n")) {
+                if (builder.length() == 0) {
+                    builder.append(it).append("\r\n");
+                } else if (completed) {
+                    if (it.matches("^\\s*[^(]+(?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),\\s*$")) {
+                        builder.append(it).append("\r\n");
+                    } else {
+                        builder.append(it);
+                        completed = false;
+                    }
+                } else {
+                    builder.append(it.trim());
+                    if (it.matches("[^)]+\\).*$")) {
+                        builder.append("\r\n");
+                        completed = true;
+                    }
+                }
+            }
+        } else if (PATTERN_ALTER_TABLE.matcher(s).find()) {
+            for (String it : s.replaceAll("(?i)^(alter\\s+table\\s+\\S+)\\s*", "$1\r\n\t")
+                              .replaceAll("(?i)\\)\\s*(references)", ")\r\n\t$1").split("\r\n")) {
+                if (builder.length() == 0) {
                     builder.append(it).append("\r\n");
                 } else if (completed) {
                     if (it.matches("^\\s*[^(]+(?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),\\s*$")) {
