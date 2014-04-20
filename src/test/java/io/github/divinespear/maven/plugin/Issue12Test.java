@@ -68,4 +68,13 @@ public class Issue12Test {
         JpaSchemaGeneratorMojo mojo = new JpaSchemaGeneratorMojo();
         assertThat(mojo.format(from), is(expected));
     }
+
+    @Test
+    public void shouldOverrideCreateIndex() {
+        String from = "CREATE INDEX INDEX_SYSTEM_CURRENCY_RATE_VERSION DESC ON SYSTEM_CURRENCY_RATE (VERSION DESC);";
+        String expected = "CREATE INDEX INDEX_SYSTEM_CURRENCY_RATE_VERSION\r\n"
+                          + "\tON SYSTEM_CURRENCY_RATE (VERSION DESC);";
+        JpaSchemaGeneratorMojo mojo = new JpaSchemaGeneratorMojo();
+        assertThat(mojo.format(from), is(expected));
+    }
 }

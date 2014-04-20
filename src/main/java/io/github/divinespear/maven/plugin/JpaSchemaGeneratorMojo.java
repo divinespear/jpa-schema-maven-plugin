@@ -669,6 +669,9 @@ public class JpaSchemaGeneratorMojo
                     }
                 }
             }
+            String tmp = builder.toString();
+            builder.setLength(0);
+            builder.append(tmp.replaceAll("(?i)(asc|desc)\\s*(on)", "$2"));
         } else if (PATTERN_ALTER_TABLE.matcher(s).find()) {
             for (String it : s.replaceAll("(?i)^(alter\\s+table\\s+\\S+)\\s*", "$1\r\n\t")
                               .replaceAll("(?i)\\)\\s*(references)", ")\r\n\t$1").split("\r\n")) {
