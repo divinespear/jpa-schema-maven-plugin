@@ -38,6 +38,7 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 final class ConnectionMock
         implements Connection {
@@ -1037,6 +1038,17 @@ final class ConnectionMock
             public boolean allProceduresAreCallable() throws SQLException {
                 return false;
             }
+
+            public ResultSet getPseudoColumns(String catalog,
+                                              String schemaPattern,
+                                              String tableNamePattern,
+                                              String columnNamePattern) throws SQLException {
+                return null;
+            }
+
+            public boolean generatedKeyAlwaysReturned() throws SQLException {
+                return false;
+            }
         };
     }
 
@@ -1227,5 +1239,24 @@ final class ConnectionMock
     public Struct createStruct(String typeName,
                                Object[] attributes) throws SQLException {
         return null;
+    }
+
+    public void setSchema(String schema) throws SQLException {
+    }
+
+    public String getSchema() throws SQLException {
+        return null;
+    }
+
+    public void abort(Executor executor) throws SQLException {
+    }
+
+    public void setNetworkTimeout(Executor executor,
+                                  int milliseconds) throws SQLException {
+
+    }
+
+    public int getNetworkTimeout() throws SQLException {
+        return 0;
     }
 }
