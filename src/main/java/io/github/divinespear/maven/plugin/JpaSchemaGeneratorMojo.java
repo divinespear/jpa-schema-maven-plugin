@@ -617,8 +617,8 @@ public class JpaSchemaGeneratorMojo
     }
 
     private static final Pattern
-            PATTERN_CREATE_TABLE = Pattern.compile("(?i)^create\\s+(?:table|view)"),
-            PATTERN_CREATE_INDEX = Pattern.compile("(?i)^create\\s+index"),
+            PATTERN_CREATE_TABLE = Pattern.compile("(?i)^create(\\s+\\S+)?\\s+(?:table|view)"),
+            PATTERN_CREATE_INDEX = Pattern.compile("(?i)^create(\\s+\\S+)?\\s+index"),
             PATTERN_ALTER_TABLE = Pattern.compile("(?i)^alter\\s+table");
 
     String format(String s) {
@@ -651,7 +651,7 @@ public class JpaSchemaGeneratorMojo
                 }
             }
         } else if (PATTERN_CREATE_INDEX.matcher(s).find()) {
-            for (String it : s.replaceAll("(?i)^(create\\s+index\\s+\\S+)\\s*", "$1\r\n\t").split("\r\n")) {
+            for (String it : s.replaceAll("(?i)^(create(\\s+\\S+)?\\s+index\\s+\\S+)\\s*", "$1\r\n\t").split("\r\n")) {
                 if (builder.length() == 0) {
                     builder.append(it).append("\r\n");
                 } else if (completed) {
@@ -669,6 +669,9 @@ public class JpaSchemaGeneratorMojo
                     }
                 }
             }
+            String tmp = builder.toString();
+            builder.setLength(0);
+            builder.append(tmp.replaceAll("(?i)(asc|desc)\\s*(on)", "$2"));
         } else if (PATTERN_ALTER_TABLE.matcher(s).find()) {
             for (String it : s.replaceAll("(?i)^(alter\\s+table\\s+\\S+)\\s*", "$1\r\n\t")
                               .replaceAll("(?i)\\)\\s*(references)", ")\r\n\t$1").split("\r\n")) {
