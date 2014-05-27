@@ -20,7 +20,7 @@ Define plugin at your maven `pom.xml` file like below.
 				<plugin>
 					<groupId>io.github.divinespear</groupId>
 					<artifactId>jpa-schema-maven-plugin</artifactId>
-					<version>0.1.9</version>
+					<version>0.1.10</version>
 					<configuration>
 						...
 					</configuration>
@@ -58,10 +58,10 @@ It's about `databaseProductName` property. If not listed below, will work as bas
 ### for EclipseLink
 `databaseMajorVersion` and `databaseMinorVersion` is not required.
 
-* `Oracle 12`: Oracle 12g
-* `Oracle 11`: Oracle 11g
-* `Oracle 10`: Oracle 10g
-* `Oracle 9`: Oracle 9i
+* `Oracle12`: Oracle 12g
+* `Oracle11`: Oracle 11g
+* `Oracle10`: Oracle 10g
+* `Oracle9`: Oracle 9i
 * `Oracle`: Oracle with default compatibility
 * `Microsoft SQL Server`
 * `DB2`
@@ -85,9 +85,9 @@ some products uses different dialect by `databaseMajorVersion` and/or `databaseM
 * `HSQL Database Engine`
 * `H2`
 * `MySQL`: 5.0 or above, 4.x or below
-* `PostgreSQL`: 9.x, 8.x (8.2 or above), 8.1 or below
+* `PostgreSQL`: 9.x, 8.2 or above, 8.1 or below
 * `Apache Derby`: 10.7 or above, 10.6, 10.5, 10.4 or below
-* `ingres`: 10.x, 9.x (9.2 or above), 9.1 or below
+* `ingres`: 10.x, 9.2 or above, 9.1 or below
 * `Microsoft SQL Server`: 11.x, 10.x, 9.x, 8.x or below
 * `Sybase SQL Server`
 * `Adaptive Server Enterprise` = Sybase
