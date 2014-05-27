@@ -5,7 +5,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -33,7 +32,7 @@ abstract class AbstractSchemaGeneratorMojoTest
     }
 
     protected File getPomFile(String path,
-                            String pomFileName) {
+                              String pomFileName) {
         return new File(new File(getBasedir(), path), pomFileName);
     }
 
@@ -74,11 +73,12 @@ abstract class AbstractSchemaGeneratorMojoTest
 
     protected String readFileAsText(File file) throws IOException {
         StringBuilder builder = new StringBuilder();
-        BufferedReader reader = new BufferedReader(new FileReader(file));
+        FileReader reader = new FileReader(file);
         try {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line).append("\r\n");
+            char[] buf = new char[4096];
+            while (reader.ready()) {
+                int len = reader.read(buf);
+                builder.append(buf, 0, len);
             }
         } finally {
             reader.close();
