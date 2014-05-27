@@ -404,6 +404,31 @@ public class JpaSchemaGeneratorMojo
         return dialect;
     }
 
+    /**
+     * line separator for generated schema file.
+     * <p>
+     * support value is one of <code>CRLF</code> (windows default), <code>LF</code> (*nix, max osx), and <code>CR</code>
+     * (classic mac), in case-insensitive.
+     * <p>
+     * default value is system property <code>line.separator</code>. if JVM cannot detect <code>line.separator</code>,
+     * then use <code>LF</code> by <a href="http://git-scm.com/book/en/Customizing-Git-Git-Configuration">git
+     * <code>core.autocrlf</code> handling</a>.
+     */
+    @Parameter
+    private String lineSeparator = System.getProperty("line.separator", "\n");
+
+    private static final Map<String, String> LINE_SEPARATOR_MAP = new HashMap<String, String>();
+    static {
+        LINE_SEPARATOR_MAP.put("CR", "\r");
+        LINE_SEPARATOR_MAP.put("LF", "\n");
+        LINE_SEPARATOR_MAP.put("CRLF", "\r\n");
+    }
+
+    public String getLineSeparator() {
+        String actual = StringUtils.isEmpty(lineSeparator) ? null : LINE_SEPARATOR_MAP.get(lineSeparator.toUpperCase());
+        return actual == null ? System.getProperty("line.separator", "\n") : actual;
+    }
+
     private static final URL[] EMPTY_URLS = new URL[0];
 
     private ClassLoader getProjectClassLoader() throws MojoExecutionException {

@@ -32,7 +32,7 @@ abstract class AbstractSchemaGeneratorMojoTest
         return this.getPomFile(path, POM_FILENAME);
     }
 
-    private File getPomFile(String path,
+    protected File getPomFile(String path,
                             String pomFileName) {
         return new File(new File(getBasedir(), path), pomFileName);
     }
