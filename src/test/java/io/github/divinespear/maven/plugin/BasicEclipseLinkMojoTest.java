@@ -65,17 +65,20 @@ public class BasicEclipseLinkMojoTest
         File createScriptFile = mojo.getCreateOutputFile();
         assertThat("create script should be generated.", createScriptFile.exists(), is(true));
 
-        final String expectCreate = "CREATE TABLE KEY_VALUE_STORE (STORED_KEY VARCHAR(128) NOT NULL, CREATED_AT TIMESTAMP, STORED_VALUE VARCHAR(32768), PRIMARY KEY (STORED_KEY));\r\n"
-                                    + "CREATE TABLE MANY_COLUMN_TABLE (ID BIGINT NOT NULL, COLUMN00 VARCHAR, COLUMN01 VARCHAR, COLUMN02 VARCHAR, COLUMN03 VARCHAR, COLUMN04 VARCHAR, COLUMN05 VARCHAR, COLUMN06 VARCHAR, COLUMN07 VARCHAR, COLUMN08 VARCHAR, COLUMN09 VARCHAR, COLUMN10 VARCHAR, COLUMN11 VARCHAR, COLUMN12 VARCHAR, COLUMN13 VARCHAR, COLUMN14 VARCHAR, COLUMN15 VARCHAR, COLUMN16 VARCHAR, COLUMN17 VARCHAR, COLUMN18 VARCHAR, COLUMN19 VARCHAR, COLUMN20 VARCHAR, COLUMN21 VARCHAR, COLUMN22 VARCHAR, COLUMN23 VARCHAR, COLUMN24 VARCHAR, COLUMN25 VARCHAR, COLUMN26 VARCHAR, COLUMN27 VARCHAR, COLUMN28 VARCHAR, COLUMN29 VARCHAR, PRIMARY KEY (ID));\r\n"
-                                    + "CREATE SEQUENCE SEQ_GEN_SEQUENCE INCREMENT BY 50 START WITH 50;\r\n";
+        final String expectCreate = "CREATE TABLE KEY_VALUE_STORE (STORED_KEY VARCHAR(128) NOT NULL, CREATED_AT TIMESTAMP, STORED_VALUE VARCHAR(32768), PRIMARY KEY (STORED_KEY));"
+                                    + LINE_SEPARATOR
+                                    + "CREATE TABLE MANY_COLUMN_TABLE (ID BIGINT NOT NULL, COLUMN00 VARCHAR, COLUMN01 VARCHAR, COLUMN02 VARCHAR, COLUMN03 VARCHAR, COLUMN04 VARCHAR, COLUMN05 VARCHAR, COLUMN06 VARCHAR, COLUMN07 VARCHAR, COLUMN08 VARCHAR, COLUMN09 VARCHAR, COLUMN10 VARCHAR, COLUMN11 VARCHAR, COLUMN12 VARCHAR, COLUMN13 VARCHAR, COLUMN14 VARCHAR, COLUMN15 VARCHAR, COLUMN16 VARCHAR, COLUMN17 VARCHAR, COLUMN18 VARCHAR, COLUMN19 VARCHAR, COLUMN20 VARCHAR, COLUMN21 VARCHAR, COLUMN22 VARCHAR, COLUMN23 VARCHAR, COLUMN24 VARCHAR, COLUMN25 VARCHAR, COLUMN26 VARCHAR, COLUMN27 VARCHAR, COLUMN28 VARCHAR, COLUMN29 VARCHAR, PRIMARY KEY (ID));"
+                                    + LINE_SEPARATOR
+                                    + "CREATE SEQUENCE SEQ_GEN_SEQUENCE INCREMENT BY 50 START WITH 50;"
+                                    + LINE_SEPARATOR;
         assertThat(this.readFileAsText(createScriptFile), is(expectCreate));
 
         File dropScriptFile = mojo.getDropOutputFile();
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
 
-        final String expectDrop = "DROP TABLE KEY_VALUE_STORE;\r\n"
-                                  + "DROP TABLE MANY_COLUMN_TABLE;\r\n"
-                                  + "DROP SEQUENCE SEQ_GEN_SEQUENCE;\r\n";
+        final String expectDrop = "DROP TABLE KEY_VALUE_STORE;" + LINE_SEPARATOR
+                                  + "DROP TABLE MANY_COLUMN_TABLE;" + LINE_SEPARATOR
+                                  + "DROP SEQUENCE SEQ_GEN_SEQUENCE;" + LINE_SEPARATOR;
         assertThat(this.readFileAsText(dropScriptFile), is(expectDrop));
     }
 
@@ -95,55 +98,59 @@ public class BasicEclipseLinkMojoTest
         File createScriptFile = mojo.getCreateOutputFile();
         assertThat("create script should be generated.", createScriptFile.exists(), is(true));
 
-        final String expectCreate = "CREATE TABLE KEY_VALUE_STORE (\r\n"
-                                    + "\tSTORED_KEY VARCHAR(128) NOT NULL,\r\n"
-                                    + "\tCREATED_AT TIMESTAMP,\r\n"
-                                    + "\tSTORED_VALUE VARCHAR(32768),\r\n"
-                                    + "\tPRIMARY KEY (STORED_KEY)\r\n"
-                                    + ");\r\n"
-                                    + "CREATE TABLE MANY_COLUMN_TABLE (\r\n"
-                                    + "\tID BIGINT NOT NULL,\r\n"
-                                    + "\tCOLUMN00 VARCHAR,\r\n"
-                                    + "\tCOLUMN01 VARCHAR,\r\n"
-                                    + "\tCOLUMN02 VARCHAR,\r\n"
-                                    + "\tCOLUMN03 VARCHAR,\r\n"
-                                    + "\tCOLUMN04 VARCHAR,\r\n"
-                                    + "\tCOLUMN05 VARCHAR,\r\n"
-                                    + "\tCOLUMN06 VARCHAR,\r\n"
-                                    + "\tCOLUMN07 VARCHAR,\r\n"
-                                    + "\tCOLUMN08 VARCHAR,\r\n"
-                                    + "\tCOLUMN09 VARCHAR,\r\n"
-                                    + "\tCOLUMN10 VARCHAR,\r\n"
-                                    + "\tCOLUMN11 VARCHAR,\r\n"
-                                    + "\tCOLUMN12 VARCHAR,\r\n"
-                                    + "\tCOLUMN13 VARCHAR,\r\n"
-                                    + "\tCOLUMN14 VARCHAR,\r\n"
-                                    + "\tCOLUMN15 VARCHAR,\r\n"
-                                    + "\tCOLUMN16 VARCHAR,\r\n"
-                                    + "\tCOLUMN17 VARCHAR,\r\n"
-                                    + "\tCOLUMN18 VARCHAR,\r\n"
-                                    + "\tCOLUMN19 VARCHAR,\r\n"
-                                    + "\tCOLUMN20 VARCHAR,\r\n"
-                                    + "\tCOLUMN21 VARCHAR,\r\n"
-                                    + "\tCOLUMN22 VARCHAR,\r\n"
-                                    + "\tCOLUMN23 VARCHAR,\r\n"
-                                    + "\tCOLUMN24 VARCHAR,\r\n"
-                                    + "\tCOLUMN25 VARCHAR,\r\n"
-                                    + "\tCOLUMN26 VARCHAR,\r\n"
-                                    + "\tCOLUMN27 VARCHAR,\r\n"
-                                    + "\tCOLUMN28 VARCHAR,\r\n"
-                                    + "\tCOLUMN29 VARCHAR,\r\n"
-                                    + "\tPRIMARY KEY (ID)\r\n"
-                                    + ");\r\n"
-                                    + "CREATE SEQUENCE SEQ_GEN_SEQUENCE INCREMENT BY 50 START WITH 50;\r\n";
+        final String expectCreate = "CREATE TABLE KEY_VALUE_STORE (" + LINE_SEPARATOR
+                                    + "\tSTORED_KEY VARCHAR(128) NOT NULL," + LINE_SEPARATOR
+                                    + "\tCREATED_AT TIMESTAMP," + LINE_SEPARATOR
+                                    + "\tSTORED_VALUE VARCHAR(32768)," + LINE_SEPARATOR
+                                    + "\tPRIMARY KEY (STORED_KEY)" + LINE_SEPARATOR
+                                    + ");" + LINE_SEPARATOR
+                                    + "CREATE TABLE MANY_COLUMN_TABLE (" + LINE_SEPARATOR
+                                    + "\tID BIGINT NOT NULL," + LINE_SEPARATOR
+                                    + "\tCOLUMN00 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN01 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN02 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN03 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN04 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN05 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN06 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN07 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN08 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN09 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN10 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN11 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN12 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN13 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN14 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN15 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN16 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN17 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN18 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN19 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN20 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN21 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN22 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN23 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN24 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN25 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN26 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN27 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN28 VARCHAR," + LINE_SEPARATOR
+                                    + "\tCOLUMN29 VARCHAR," + LINE_SEPARATOR
+                                    + "\tPRIMARY KEY (ID)" + LINE_SEPARATOR
+                                    + ");" + LINE_SEPARATOR
+                                    + "CREATE SEQUENCE SEQ_GEN_SEQUENCE INCREMENT BY 50 START WITH 50;"
+                                    + LINE_SEPARATOR;
         assertThat(this.readFileAsText(createScriptFile), is(expectCreate));
 
         File dropScriptFile = mojo.getDropOutputFile();
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
 
-        final String expectDrop = "DROP TABLE KEY_VALUE_STORE;\r\n"
-                                  + "DROP TABLE MANY_COLUMN_TABLE;\r\n"
-                                  + "DROP SEQUENCE SEQ_GEN_SEQUENCE;\r\n";
+        final String expectDrop = "DROP TABLE KEY_VALUE_STORE;"
+                                  + LINE_SEPARATOR
+                                  + "DROP TABLE MANY_COLUMN_TABLE;"
+                                  + LINE_SEPARATOR
+                                  + "DROP SEQUENCE SEQ_GEN_SEQUENCE;"
+                                  + LINE_SEPARATOR;
         assertThat(this.readFileAsText(dropScriptFile), is(expectDrop));
     }
 

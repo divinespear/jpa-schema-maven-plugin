@@ -23,6 +23,8 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 
 abstract class AbstractSchemaGeneratorMojoTest
         extends AbstractMojoTestCase {
+    
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private static final String POM_FILENAME = "pom.xml";
 
