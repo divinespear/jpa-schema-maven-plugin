@@ -603,6 +603,8 @@ public class JpaSchemaGeneratorMojo
                                                                        Pattern.CASE_INSENSITIVE);
 
     private void postProcess() throws IOException {
+        final String linesep = this.getLineSeparator();
+
         List<File> files = Arrays.asList(this.getCreateOutputFile(), this.getDropOutputFile());
         for (File file : files) {
             // check file exists
@@ -626,7 +628,8 @@ public class JpaSchemaGeneratorMojo
                             if (!s.endsWith(";")) {
                                 s += ";";
                             }
-                            writer.println(this.isFormat() ? format(s) : s);
+                            writer.print(this.isFormat() ? format(s) : s);
+                            writer.print(linesep);
                         }
                     }
                     writer.flush();
@@ -647,6 +650,8 @@ public class JpaSchemaGeneratorMojo
             PATTERN_ALTER_TABLE = Pattern.compile("(?i)^alter\\s+table");
 
     String format(String s) {
+        final String linesep = this.getLineSeparator();
+
         s = s.replaceAll("^([^(]+\\()", "$1\r\n\t")
              .replaceAll("\\)[^()]*$", "\r\n$0")
              .replaceAll("((?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),)\\s*", "$1\r\n\t");
@@ -656,13 +661,13 @@ public class JpaSchemaGeneratorMojo
             for (String it : s.split("\r\n")) {
                 if (it.matches("^\\S.*$")) {
                     if (!completed) {
-                        builder.append("\r\n");
+                        builder.append(linesep);
                         completed = true;
                     }
-                    builder.append(it).append("\r\n");
+                    builder.append(it).append(linesep);
                 } else if (completed) {
                     if (it.matches("^\\s*[^(]+(?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),\\s*$")) {
-                        builder.append(it).append("\r\n");
+                        builder.append(it).append(linesep);
                     } else {
                         builder.append(it);
                         completed = false;
@@ -670,7 +675,7 @@ public class JpaSchemaGeneratorMojo
                 } else {
                     builder.append(it.trim());
                     if (it.matches("[^)]+\\).*$")) {
-                        builder.append("\r\n");
+                        builder.append(linesep);
                         completed = true;
                     }
                 }
@@ -678,10 +683,10 @@ public class JpaSchemaGeneratorMojo
         } else if (PATTERN_CREATE_INDEX.matcher(s).find()) {
             for (String it : s.replaceAll("(?i)^(create(\\s+\\S+)?\\s+index\\s+\\S+)\\s*", "$1\r\n\t").split("\r\n")) {
                 if (builder.length() == 0) {
-                    builder.append(it).append("\r\n");
+                    builder.append(it).append(linesep);
                 } else if (completed) {
                     if (it.matches("^\\s*[^(]+(?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),\\s*$")) {
-                        builder.append(it).append("\r\n");
+                        builder.append(it).append(linesep);
                     } else {
                         builder.append(it);
                         completed = false;
@@ -689,7 +694,7 @@ public class JpaSchemaGeneratorMojo
                 } else {
                     builder.append(it.trim());
                     if (it.matches("[^)]+\\).*$")) {
-                        builder.append("\r\n");
+                        builder.append(linesep);
                         completed = true;
                     }
                 }
@@ -701,10 +706,10 @@ public class JpaSchemaGeneratorMojo
             for (String it : s.replaceAll("(?i)^(alter\\s+table\\s+\\S+)\\s*", "$1\r\n\t")
                               .replaceAll("(?i)\\)\\s*(references)", ")\r\n\t$1").split("\r\n")) {
                 if (builder.length() == 0) {
-                    builder.append(it).append("\r\n");
+                    builder.append(it).append(linesep);
                 } else if (completed) {
                     if (it.matches("^\\s*[^(]+(?:[^(),\\s]+|\\S\\([^)]+\\)[^),]*),\\s*$")) {
-                        builder.append(it).append("\r\n");
+                        builder.append(it).append(linesep);
                     } else {
                         builder.append(it);
                         completed = false;
@@ -712,7 +717,7 @@ public class JpaSchemaGeneratorMojo
                 } else {
                     builder.append(it.trim());
                     if (it.matches("[^)]+\\).*$")) {
-                        builder.append("\r\n");
+                        builder.append(linesep);
                         completed = true;
                     }
                 }
