@@ -23,7 +23,7 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 
 abstract class AbstractSchemaGeneratorMojoTest
         extends AbstractMojoTestCase {
-    
+
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private static final String POM_FILENAME = "pom.xml";
@@ -50,10 +50,14 @@ abstract class AbstractSchemaGeneratorMojoTest
         invoker.execute(request);
     }
 
+    protected JpaSchemaGeneratorMojo getGenerateMojo(File pomfile) throws Exception {
+        return (JpaSchemaGeneratorMojo) lookupMojo("generate", pomfile);
+    }
+
     protected JpaSchemaGeneratorMojo executeSchemaGeneration(File pomfile) throws Exception {
         String parent = pomfile.getParent().toString();
         // create mojo
-        JpaSchemaGeneratorMojo mojo = (JpaSchemaGeneratorMojo) lookupMojo("generate", pomfile);
+        JpaSchemaGeneratorMojo mojo = getGenerateMojo(pomfile);
         assertThat(mojo, notNullValue(JpaSchemaGeneratorMojo.class));
         // configure project mock
         MavenProject projectMock = mock(MavenProject.class);
