@@ -9,7 +9,7 @@ public class Issue12Test
         extends AbstractSchemaGeneratorMojoTest {
 
     @Test
-    public void shouldFormatCreateTable() {
+    public void testShouldFormatCreateTable() {
         String from = "CREATE TABLE SYSTEM_CURRENCY_RATE_HISTORY (CREATED_DATE DATETIME NULL,LAST_MODIFIED_DATE DATETIME NULL,RATE NUMERIC(28) NULL,VERSION NUMERIC(19) NOT NULL,REFERENCE_ID VARCHAR(255) NOT NULL,CREATED_BY VARCHAR(36) NULL,LAST_MODIFIED_BY VARCHAR(36) NULL,PRIMARY KEY (VERSION,REFERENCE_ID));";
         String expected = "CREATE TABLE SYSTEM_CURRENCY_RATE_HISTORY (" + LINE_SEPARATOR
                           + "\tCREATED_DATE DATETIME NULL," + LINE_SEPARATOR
@@ -26,7 +26,7 @@ public class Issue12Test
     }
 
     @Test
-    public void shouldFormatCreateTableEx() {
+    public void testShouldFormatCreateTableEx() {
         String from = "CREATE TEMPORARY TABLE SYSTEM_CURRENCY_RATE_HISTORY (CREATED_DATE DATETIME NULL,LAST_MODIFIED_DATE DATETIME NULL,RATE NUMERIC(28) NULL,VERSION NUMERIC(19) NOT NULL,REFERENCE_ID VARCHAR(255) NOT NULL,CREATED_BY VARCHAR(36) NULL,LAST_MODIFIED_BY VARCHAR(36) NULL,PRIMARY KEY (VERSION,REFERENCE_ID));";
         String expected = "CREATE TEMPORARY TABLE SYSTEM_CURRENCY_RATE_HISTORY (" + LINE_SEPARATOR
                           + "\tCREATED_DATE DATETIME NULL," + LINE_SEPARATOR
@@ -43,7 +43,7 @@ public class Issue12Test
     }
 
     @Test
-    public void shouldFormatCreateIndex() {
+    public void testShouldFormatCreateIndex() {
         String from = "CREATE INDEX INDEX_USER_ACCOUNT_ENABLED_DELETED ON USER_ACCOUNT (ENABLED,DELETED);";
         String expected = "CREATE INDEX INDEX_USER_ACCOUNT_ENABLED_DELETED" + LINE_SEPARATOR
                           + "\tON USER_ACCOUNT (ENABLED,DELETED);";
@@ -52,7 +52,7 @@ public class Issue12Test
     }
 
     @Test
-    public void shouldFormatCreateIndexEx() {
+    public void testShouldFormatCreateIndexEx() {
         String from = "CREATE UNIQUE INDEX INDEX_USER_ACCOUNT_ENABLED_DELETED ON USER_ACCOUNT (ENABLED,DELETED);";
         String expected = "CREATE UNIQUE INDEX INDEX_USER_ACCOUNT_ENABLED_DELETED" + LINE_SEPARATOR
                           + "\tON USER_ACCOUNT (ENABLED,DELETED);";
@@ -61,7 +61,7 @@ public class Issue12Test
     }
 
     @Test
-    public void shouldFormatAlterTable() {
+    public void testShouldFormatAlterTable() {
         String from = "ALTER TABLE PRODUCT_CATEGORY ADD CONSTRAINT PRODUCTCATEGORYPRENTID FOREIGN KEY (PARENT_ID) REFERENCES PRODUCT_CATEGORY (ID);";
         String expected = "ALTER TABLE PRODUCT_CATEGORY" + LINE_SEPARATOR
                           + "\tADD CONSTRAINT PRODUCTCATEGORYPRENTID FOREIGN KEY (PARENT_ID)" + LINE_SEPARATOR
@@ -71,7 +71,7 @@ public class Issue12Test
     }
 
     @Test
-    public void shouldOverrideCreateIndex() {
+    public void testShouldOverrideCreateIndex() {
         String from = "CREATE INDEX INDEX_SYSTEM_CURRENCY_RATE_VERSION DESC ON SYSTEM_CURRENCY_RATE (VERSION DESC);";
         String expected = "CREATE INDEX INDEX_SYSTEM_CURRENCY_RATE_VERSION" + LINE_SEPARATOR
                           + "\tON SYSTEM_CURRENCY_RATE (VERSION DESC);";
