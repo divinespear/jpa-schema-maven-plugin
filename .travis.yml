@@ -2,10 +2,10 @@ language: java
 
 jdk:
   - openjdk6
-  - openjdk7
+  - oraclejdk7
+  - oraclejdk8
 
-install: true
-script: mvn deploy -Dmaven.install.skip=true --settings src/travis-ci/settings.xml
+after_success: mvn deploy --settings src/travis-ci/settings.xml
 
 branches:
   only:
