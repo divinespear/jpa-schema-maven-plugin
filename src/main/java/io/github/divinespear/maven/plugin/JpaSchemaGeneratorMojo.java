@@ -589,12 +589,19 @@ public class JpaSchemaGeneratorMojo
         if (this.dialect != null) {
             map.put(org.hibernate.cfg.AvailableSettings.DIALECT, this.dialect);
         }
+
         if (!this.isDatabaseTarget() && StringUtils.isEmpty(this.jdbcUrl)) {
             map.put(AvailableSettings.SCHEMA_GEN_CONNECTION,
                     new ConnectionMock(this.getDatabaseProductName(),
                                        this.getDatabaseMajorVersion(),
                                        this.getDatabaseMinorVersion()));
         }
+
+        /* force override JTA to RESOURCE_LOCAL */
+        map.put(PersistenceUnitProperties.TRANSACTION_TYPE, "RESOURCE_LOCAL");
+        map.put(PersistenceUnitProperties.JTA_DATASOURCE, null);
+        map.put(PersistenceUnitProperties.NON_JTA_DATASOURCE, null);
+        map.put(PersistenceUnitProperties.VALIDATION_MODE, "NONE");
 
         Persistence.generateSchema(this.persistenceUnitName, map);
     }
