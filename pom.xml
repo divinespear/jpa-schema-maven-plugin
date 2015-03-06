@@ -70,7 +70,7 @@
 		<version-maven>3.0.5</version-maven>
 		<version-maven.plugin-tools>3.3</version-maven.plugin-tools>
 		<version-org.eclipse.persistence>2.5.2</version-org.eclipse.persistence>
-		<version-org.hibernate>4.3.6.Final</version-org.hibernate>
+		<version-org.hibernate>4.3.8.Final</version-org.hibernate>
 	</properties>
 
 	<dependencies>
@@ -147,7 +147,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
-			<version>1.6.4.RELEASE</version>
+			<version>1.7.2.RELEASE</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -333,5 +333,40 @@
 				<artifactId>maven-release-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-plugin-plugin
+										</artifactId>
+										<versionRange>
+											[3.3,)
+										</versionRange>
+										<goals>
+											<goal>descriptor</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>
