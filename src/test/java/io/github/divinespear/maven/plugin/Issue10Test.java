@@ -51,7 +51,7 @@ public class Issue10Test
 
         final String expectDrop = "drop table key_value_store if exists;" + LINE_SEPARATOR
                                   + "drop table many_column_table if exists;" + LINE_SEPARATOR
-                                  + "drop sequence hibernate_sequence;" + LINE_SEPARATOR;
+                                  + "drop sequence if exists hibernate_sequence;" + LINE_SEPARATOR;
         assertThat(this.readFileAsText(dropScriptFile), is(expectDrop));
     }
 }
