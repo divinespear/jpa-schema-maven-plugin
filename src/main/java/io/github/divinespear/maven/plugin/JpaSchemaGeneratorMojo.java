@@ -417,7 +417,7 @@ public class JpaSchemaGeneratorMojo
     @Parameter
     private String lineSeparator = System.getProperty("line.separator", "\n");
 
-    private static final Map<String, String> LINE_SEPARATOR_MAP = new HashMap<String, String>();
+    private static final Map<String, String> LINE_SEPARATOR_MAP = new HashMap<>();
     static {
         LINE_SEPARATOR_MAP.put("CR", "\r");
         LINE_SEPARATOR_MAP.put("LF", "\n");
@@ -439,7 +439,7 @@ public class JpaSchemaGeneratorMojo
                 classfiles.addAll(this.project.getTestClasspathElements());
             }
             // classpath to url
-            List<URL> classURLs = new ArrayList<URL>(classfiles.size());
+            List<URL> classURLs = new ArrayList<>(classfiles.size());
             for (String classfile : classfiles) {
                 classURLs.add(new File(classfile).toURI().toURL());
             }
@@ -485,7 +485,7 @@ public class JpaSchemaGeneratorMojo
     }
 
     private void generate() throws Exception {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         /*
          * Common JPA options
