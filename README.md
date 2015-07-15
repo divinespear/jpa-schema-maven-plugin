@@ -10,7 +10,7 @@ Currently support [EclipseLink](http://www.eclipse.org/eclipselink) (Reference I
 
 
 ## 0.2.x Plan
-* Support generate without `persistence.xml` (like spring-data, spring-boot, ...)
+* Support generate without `persistence.xml` (like spring-data, spring-boot, ...) related [jpa-schema-gradle-plugin#14](//github.com/divinespear/jpa-schema-gradle-plugin/issues/14)
 * Support more JPA 2.1 implementations (and also support JPA 2.0 implementations if possible)
 
 How-to Use
