@@ -21,19 +21,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.github.divinespear</groupId>
-	<artifactId>eclipselink-simple-script-test</artifactId>
+	<artifactId>hibernate-simple-script-test</artifactId>
 	<version>0.0.0-TEST</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
-		<eclipselink.version>2.6.1</eclipselink.version>
+		<hibernate.version>5.0.7.Final</hibernate.version>
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>org.eclipse.persistence.jpa</artifactId>
-			<version>${eclipselink.version}</version>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${hibernate.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -45,15 +45,15 @@
 				<artifactId>jpa-schema-maven-plugin</artifactId>
 				<version>${plugin.version}</version>
 				<configuration>
-					<vendor>eclipselink</vendor>
+					<vendor>hibernate</vendor>
 					<packageToScan>
 						<string>io.github.divinespear</string>
 					</packageToScan>
-					<outputDirectory>${basedir}/target/test-classes/unit/eclipselink-noxml-script-test/target/generated-schema</outputDirectory>
+					<outputDirectory>${basedir}/target/test-classes/unit/hibernate-noxml-script-test/target/generated-schema</outputDirectory>
 					<scriptAction>drop-and-create</scriptAction>
-					<databaseProductName>MySQL</databaseProductName>
-					<databaseMajorVersion>5</databaseMajorVersion>
-					<databaseMinorVersion>5</databaseMinorVersion>
+					<databaseProductName>H2</databaseProductName>
+					<databaseMajorVersion>1</databaseMajorVersion>
+					<databaseMinorVersion>3</databaseMinorVersion>
 				</configuration>
 			</plugin>
 		</plugins>

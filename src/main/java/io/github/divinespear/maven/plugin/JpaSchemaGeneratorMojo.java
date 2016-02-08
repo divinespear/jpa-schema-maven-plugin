@@ -20,12 +20,17 @@
 package io.github.divinespear.maven.plugin;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -40,7 +45,6 @@ import java.util.regex.Pattern;
 import javax.persistence.Persistence;
 import javax.persistence.spi.PersistenceProvider;
 
-import org.apache.commons.lang.NullArgumentException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -60,12 +64,11 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.StringUtils;
+import org.datanucleus.PropertyNames;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
-import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
-import org.hibernate.jpa.AvailableSettings;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager;
+import org.springframework.orm.jpa.persistenceunit.SmartPersistenceUnitInfo;
 
 /**
  * Generate database schema or DDL scripts.
@@ -445,7 +448,7 @@ public class JpaSchemaGeneratorMojo
         return vendor;
     }
 
-    public Class<? extends PersistenceProvider> getProvider() {
+    public Class<? extends PersistenceProvider> getProviderClass() {
         return PROVIDER_MAP.get(vendor);
     }
 
@@ -508,137 +511,60 @@ public class JpaSchemaGeneratorMojo
         }
     }
 
-    private boolean isDatabaseTarget() {
-        return !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(this.databaseAction);
-    }
-
-    private boolean isScriptTarget() {
-        return !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(this.scriptAction);
-    }
-
-    @SuppressWarnings("deprecation")
     private void generate() throws Exception {
-        Map<String, Object> map = new HashMap<>();
-
-        /*
-         * Common JPA options
-         */
-        // mode
-        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DATABASE_ACTION, this.databaseAction.toLowerCase());
-        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_ACTION, this.scriptAction.toLowerCase());
-        // output files
-        if (this.isScriptTarget()) {
-            if (this.outputDirectory == null) {
-                throw new NullArgumentException("outputDirectory is required for script generation.");
-            }
-            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_CREATE_TARGET,
-                    this.getCreateOutputFile().toURI().toString());
-            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_SCRIPTS_DROP_TARGET,
-                    this.getDropOutputFile().toURI().toString());
-
-        }
-        // database emulation options
-        map.put(PersistenceUnitProperties.SCHEMA_DATABASE_PRODUCT_NAME, this.databaseProductName);
-        map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MAJOR_VERSION,
-                this.databaseMajorVersion == null ? null : String.valueOf(this.databaseMajorVersion));
-        map.put(PersistenceUnitProperties.SCHEMA_DATABASE_MINOR_VERSION,
-                this.databaseMinorVersion == null ? null : String.valueOf(this.databaseMinorVersion));
-        // database options
-        map.put(PersistenceUnitProperties.JDBC_DRIVER, this.jdbcDriver);
-        map.put(PersistenceUnitProperties.JDBC_URL, this.jdbcUrl);
-        map.put(PersistenceUnitProperties.JDBC_USER, this.jdbcUser);
-        map.put(PersistenceUnitProperties.JDBC_PASSWORD, this.jdbcPassword);
-        // source selection
-        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SOURCE, this.createSourceMode);
-        if (this.createSourceFile == null) {
-            if (!PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE.equals(this.createSourceMode)) {
-                throw new IllegalArgumentException("create source file is required for mode "
-                                                   + this.createSourceMode);
-            }
+        Map<String, Object> map = JpaSchemaGeneratorUtils.buildProperties(this);
+        if (getVendor() == null) {
+            // with persistence.xml
+            Persistence.generateSchema(this.persistenceUnitName, map);
         } else {
-            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SCRIPT_SOURCE,
-                    this.createSourceFile.toURI().toString());
-        }
-        map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SOURCE, this.dropSourceMode);
-        if (this.dropSourceFile == null) {
-            if (!PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE.equals(this.dropSourceMode)) {
-                throw new IllegalArgumentException("drop source file is required for mode "
-                                                   + this.dropSourceMode);
+            PersistenceProvider provider = getProviderClass().newInstance();
+            List<String> packages = getPackageToScan();
+            if (packages.isEmpty()) {
+                throw new IllegalArgumentException("packageToScan is required on xml-less mode.");
             }
-        } else {
-            map.put(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SCRIPT_SOURCE,
-                    this.dropSourceFile.toURI().toString());
+
+            DefaultPersistenceUnitManager manager = new DefaultPersistenceUnitManager();
+            manager.setDefaultPersistenceUnitName(getPersistenceUnitName());
+            manager.setPackagesToScan(packages.toArray(new String[packages.size()]));
+            manager.afterPropertiesSet();
+
+            SmartPersistenceUnitInfo info = (SmartPersistenceUnitInfo) manager.obtainDefaultPersistenceUnitInfo();
+            info.setPersistenceProviderPackageName(provider.getClass().getName());
+            info.getProperties().putAll(map);
+
+            Path persistenceXml = null;
+            if (Vendor.datanucleus.equals(getVendor())) {
+                // datanucleus must need persistence.xml
+                Path path = Paths.get(project.getBuild().getOutputDirectory(), "META-INF");
+                persistenceXml = Files.createTempFile(path, "persistence-", ".xml");
+                try (BufferedWriter writer = Files.newBufferedWriter(persistenceXml, StandardCharsets.UTF_8)) {
+                    PrintWriter out = new PrintWriter(writer);
+                    out.println("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
+                    out.println("<persistence version=\"2.1\"");
+                    out.println("    xmlns=\"http://xmlns.jcp.org/xml/ns/persistence\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+                    out.println("    xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/persistence http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/persistence/persistence_2_1.xsd\">");
+                    out.printf("    <persistence-unit name=\"%s\" transaction-type=\"RESOURCE_LOCAL\">\n",
+                               info.getPersistenceUnitName());
+                    out.println("        <provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>");
+                    out.println("        <exclude-unlisted-classes>false</exclude-unlisted-classes>");
+                    out.println("    </persistence-unit>");
+                    out.println("</persistence>");
+                }
+                map.put(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME, persistenceXml.toAbsolutePath().toString());
+
+                // datanucleus does not support execution order...
+                map.remove(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SOURCE);
+                map.remove(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SOURCE);
+            }
+
+            try {
+                provider.generateSchema(info, map);
+            } finally {
+                if (persistenceXml != null) {
+                    Files.delete(persistenceXml);
+                }
+            }
         }
-
-        /*
-         * EclipseLink specific
-         */
-        // persistence.xml
-        map.put(PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML, this.persistenceXml);
-
-        /*
-         * Hibernate specific
-         */
-        // auto-detect
-        map.put(AvailableSettings.AUTODETECTION, "class,hbm");
-        // dialect (without jdbc connection)
-        String dialect = properties.get(org.hibernate.cfg.AvailableSettings.DIALECT);
-        if (StringUtils.isEmpty(dialect) && StringUtils.isEmpty(this.jdbcUrl)) {
-            DialectResolutionInfo info = new DialectResolutionInfo() {
-                @Override
-                public String getDriverName() {
-                    return null;
-                }
-
-                @Override
-                public int getDriverMinorVersion() {
-                    return 0;
-                }
-
-                @Override
-                public int getDriverMajorVersion() {
-                    return 0;
-                }
-
-                @Override
-                public String getDatabaseName() {
-                    return databaseProductName;
-                }
-
-                @Override
-                public int getDatabaseMinorVersion() {
-                    return databaseMinorVersion;
-                }
-
-                @Override
-                public int getDatabaseMajorVersion() {
-                    return databaseMajorVersion;
-                }
-            };
-            Dialect detectedDialect = StandardDialectResolver.INSTANCE.resolveDialect(info);
-            dialect = detectedDialect.getClass().getName();
-        }
-        if (dialect != null) {
-            properties.remove(org.hibernate.cfg.AvailableSettings.DIALECT);
-            map.put(org.hibernate.cfg.AvailableSettings.DIALECT, dialect);
-        }
-
-        if (!this.isDatabaseTarget() && StringUtils.isEmpty(this.jdbcUrl)) {
-            map.put(AvailableSettings.SCHEMA_GEN_CONNECTION,
-                    new ConnectionMock(this.getDatabaseProductName(),
-                                       this.getDatabaseMajorVersion(),
-                                       this.getDatabaseMinorVersion()));
-        }
-
-        map.putAll(properties);
-
-        /* force override JTA to RESOURCE_LOCAL */
-        map.put(PersistenceUnitProperties.TRANSACTION_TYPE, "RESOURCE_LOCAL");
-        map.put(PersistenceUnitProperties.JTA_DATASOURCE, null);
-        map.put(PersistenceUnitProperties.NON_JTA_DATASOURCE, null);
-        map.put(PersistenceUnitProperties.VALIDATION_MODE, "NONE");
-
-        Persistence.generateSchema(this.persistenceUnitName, map);
     }
 
     private static final Pattern CREATE_DROP_PATTERN = Pattern.compile("((?:create|drop|alter)\\s+(?:table|view|sequence))",

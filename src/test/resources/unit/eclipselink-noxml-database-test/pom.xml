@@ -21,7 +21,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.github.divinespear</groupId>
-	<artifactId>eclipselink-simple-script-test</artifactId>
+	<artifactId>eclipselink-simple-database-test</artifactId>
 	<version>0.0.0-TEST</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,11 +49,10 @@
 					<packageToScan>
 						<string>io.github.divinespear</string>
 					</packageToScan>
-					<outputDirectory>${basedir}/target/test-classes/unit/eclipselink-noxml-script-test/target/generated-schema</outputDirectory>
-					<scriptAction>drop-and-create</scriptAction>
-					<databaseProductName>MySQL</databaseProductName>
-					<databaseMajorVersion>5</databaseMajorVersion>
-					<databaseMinorVersion>5</databaseMinorVersion>
+					<databaseAction>drop-and-create</databaseAction>
+					<jdbcDriver>org.h2.Driver</jdbcDriver>
+					<jdbcUrl>jdbc:h2:nio:${basedir}/target/test-classes/unit/eclipselink-noxml-database-test/target/test</jdbcUrl>
+					<jdbcUser>sa</jdbcUser>
 				</configuration>
 			</plugin>
 		</plugins>
