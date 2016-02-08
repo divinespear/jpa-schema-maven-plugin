@@ -20,17 +20,14 @@
 package io.github.divinespear.maven.plugin;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -64,7 +61,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.StringUtils;
-import org.datanucleus.PropertyNames;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager;
@@ -132,8 +128,8 @@ public class JpaSchemaGeneratorMojo
     /**
      * location of {@code persistence.xml} file
      * <p>
-     * Note for Hibernate: <b>current version (4.3.1.Final) DOES NOT SUPPORT custom location.</b> ({@link SchemaExport}
-     * support it, but JPA 2.1 schema generator does NOT.)
+     * Note for Hibernate <b>DOES NOT SUPPORT custom location.</b> ({@link SchemaExport} support it, but JPA 2.1 schema
+     * generator does NOT.)
      */
     @Parameter(required = true, defaultValue = PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML_DEFAULT)
     private String persistenceXml = PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML_DEFAULT;
@@ -418,7 +414,7 @@ public class JpaSchemaGeneratorMojo
     public enum Vendor {
         eclipselink,
         hibernate,
-        datanucleus,
+        // datanucleus,
     }
 
     /**
@@ -428,7 +424,6 @@ public class JpaSchemaGeneratorMojo
      * <ul>
      * <li>{@code eclipselink}</li>
      * <li>{@code hibernate}</li>
-     * <li>{@code datanucleus}</li>
      * </ul>
      * <p>
      * <b>REQUIRED for project without {@code persistence.xml}</b>
@@ -441,7 +436,7 @@ public class JpaSchemaGeneratorMojo
     static {
         PROVIDER_MAP.put(Vendor.eclipselink, org.eclipse.persistence.jpa.PersistenceProvider.class);
         PROVIDER_MAP.put(Vendor.hibernate, org.hibernate.jpa.HibernatePersistenceProvider.class);
-        PROVIDER_MAP.put(Vendor.datanucleus, org.datanucleus.api.jpa.PersistenceProviderImpl.class);
+        // PROVIDER_MAP.put(Vendor.datanucleus, org.datanucleus.api.jpa.PersistenceProviderImpl.class);
     }
 
     public Vendor getVendor() {
@@ -533,6 +528,8 @@ public class JpaSchemaGeneratorMojo
             info.getProperties().putAll(map);
 
             Path persistenceXml = null;
+            /* @formatter:off */
+            /*
             if (Vendor.datanucleus.equals(getVendor())) {
                 // datanucleus must need persistence.xml
                 Path path = Paths.get(project.getBuild().getOutputDirectory(), "META-INF");
@@ -556,6 +553,8 @@ public class JpaSchemaGeneratorMojo
                 map.remove(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SOURCE);
                 map.remove(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SOURCE);
             }
+            */
+            /* @formatter:on */
 
             try {
                 provider.generateSchema(info, map);
