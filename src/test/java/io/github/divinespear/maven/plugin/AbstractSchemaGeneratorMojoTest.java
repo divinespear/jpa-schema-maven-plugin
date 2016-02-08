@@ -8,6 +8,8 @@ import static org.mockito.Mockito.mock;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
@@ -71,19 +73,29 @@ abstract class AbstractSchemaGeneratorMojoTest
         return mojo;
     }
 
-    protected String readFileAsText(File file) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        FileReader reader = new FileReader(file);
-        try {
+    protected String readResourceAsString(String name) throws IOException {
+        try (InputStream stream = getClass().getResourceAsStream(name)) {
+            StringBuilder builder = new StringBuilder();
+            InputStreamReader reader = new InputStreamReader(stream);
             char[] buf = new char[4096];
             while (reader.ready()) {
                 int len = reader.read(buf);
                 builder.append(buf, 0, len);
             }
-        } finally {
-            reader.close();
+            return builder.toString();
         }
-        return builder.toString();
+    }
+
+    protected String readFileAsString(File file) throws IOException {
+        try (FileReader reader = new FileReader(file)) {
+            StringBuilder builder = new StringBuilder();
+            char[] buf = new char[4096];
+            while (reader.ready()) {
+                int len = reader.read(buf);
+                builder.append(buf, 0, len);
+            }
+            return builder.toString();
+        }
     }
 
 }

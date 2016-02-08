@@ -64,20 +64,14 @@ public class BasicHibernateMojoTest
         File createScriptFile = mojo.getCreateOutputFile();
         assertThat("create script should be generated.", createScriptFile.exists(), is(true));
 
-        final String expectCreate = "create table key_value_store (stored_key varchar(128) not null, created_at timestamp, stored_value varchar(32768), primary key (stored_key));"
-                                    + LINE_SEPARATOR
-                                    + "create table many_column_table (id bigint not null, column00 varchar(255), column01 varchar(255), column02 varchar(255), column03 varchar(255), column04 varchar(255), column05 varchar(255), column06 varchar(255), column07 varchar(255), column08 varchar(255), column09 varchar(255), column10 varchar(255), column11 varchar(255), column12 varchar(255), column13 varchar(255), column14 varchar(255), column15 varchar(255), column16 varchar(255), column17 varchar(255), column18 varchar(255), column19 varchar(255), column20 varchar(255), column21 varchar(255), column22 varchar(255), column23 varchar(255), column24 varchar(255), column25 varchar(255), column26 varchar(255), column27 varchar(255), column28 varchar(255), column29 varchar(255), primary key (id));"
-                                    + LINE_SEPARATOR
-                                    + "create sequence hibernate_sequence;" + LINE_SEPARATOR;
-        assertThat(this.readFileAsText(createScriptFile), is(expectCreate));
+        final String expectCreate = readResourceAsString("/unit/hibernate-simple-script-test/expected-create.txt");
+        assertThat(this.readFileAsString(createScriptFile), is(expectCreate));
 
         File dropScriptFile = mojo.getDropOutputFile();
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
 
-        final String expectDrop = "drop table key_value_store if exists;" + LINE_SEPARATOR
-                                  + "drop table many_column_table if exists;" + LINE_SEPARATOR
-                                  + "drop sequence if exists hibernate_sequence;" + LINE_SEPARATOR;
-        assertThat(this.readFileAsText(dropScriptFile), is(expectDrop));
+        final String expectDrop = readResourceAsString("/unit/hibernate-simple-script-test/expected-drop.txt");
+        assertThat(this.readFileAsString(dropScriptFile), is(expectDrop));
     }
 
     /**
@@ -95,56 +89,14 @@ public class BasicHibernateMojoTest
         File createScriptFile = mojo.getCreateOutputFile();
         assertThat("create script should be generated.", createScriptFile.exists(), is(true));
 
-        final String expectCreate = "create table key_value_store (" + LINE_SEPARATOR
-                                    + "\tstored_key varchar(128) not null," + LINE_SEPARATOR
-                                    + "\tcreated_at timestamp," + LINE_SEPARATOR
-                                    + "\tstored_value varchar(32768)," + LINE_SEPARATOR
-                                    + "\tprimary key (stored_key)" + LINE_SEPARATOR
-                                    + ");" + LINE_SEPARATOR
-                                    + "create table many_column_table (" + LINE_SEPARATOR
-                                    + "\tid bigint not null," + LINE_SEPARATOR
-                                    + "\tcolumn00 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn01 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn02 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn03 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn04 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn05 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn06 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn07 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn08 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn09 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn10 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn11 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn12 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn13 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn14 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn15 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn16 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn17 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn18 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn19 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn20 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn21 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn22 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn23 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn24 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn25 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn26 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn27 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn28 varchar(255)," + LINE_SEPARATOR
-                                    + "\tcolumn29 varchar(255)," + LINE_SEPARATOR
-                                    + "\tprimary key (id)" + LINE_SEPARATOR
-                                    + ");" + LINE_SEPARATOR
-                                    + "create sequence hibernate_sequence;" + LINE_SEPARATOR;
-        assertThat(this.readFileAsText(createScriptFile), is(expectCreate));
+        final String expectCreate = readResourceAsString("/unit/hibernate-formatted-script-test/expected-create.txt");
+        assertThat(this.readFileAsString(createScriptFile), is(expectCreate));
 
         File dropScriptFile = mojo.getDropOutputFile();
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
 
-        final String expectDrop = "drop table key_value_store if exists;" + LINE_SEPARATOR
-                                  + "drop table many_column_table if exists;" + LINE_SEPARATOR
-                                  + "drop sequence if exists hibernate_sequence;" + LINE_SEPARATOR;
-        assertThat(this.readFileAsText(dropScriptFile), is(expectDrop));
+        final String expectDrop = readResourceAsString("/unit/hibernate-formatted-script-test/expected-drop.txt");
+        assertThat(this.readFileAsString(dropScriptFile), is(expectDrop));
     }
 
     /**

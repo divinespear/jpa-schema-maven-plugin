@@ -46,7 +46,7 @@ public class Issue17Test
                                     + LINE_SEPARATOR
                                     + "CREATE SEQUENCE SEQ_GEN_SEQUENCE INCREMENT BY 50 START WITH 50;"
                                     + LINE_SEPARATOR;
-        assertThat(this.readFileAsText(createScriptFile), is(expectCreate));
+        assertThat(this.readFileAsString(createScriptFile), is(expectCreate));
 
         File dropScriptFile = mojo.getDropOutputFile();
         assertThat("drop script should be generated.", dropScriptFile.exists(), is(true));
@@ -54,7 +54,7 @@ public class Issue17Test
         final String expectDrop = "DROP TABLE KEY_VALUE_STORE;" + LINE_SEPARATOR
                                   + "DROP TABLE MANY_COLUMN_TABLE;" + LINE_SEPARATOR
                                   + "DROP SEQUENCE SEQ_GEN_SEQUENCE;" + LINE_SEPARATOR;
-        assertThat(this.readFileAsText(dropScriptFile), is(expectDrop));
+        assertThat(this.readFileAsString(dropScriptFile), is(expectDrop));
     }
 
 }

@@ -71,8 +71,7 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
  * 
  * @author divinespear
  */
-@Mojo(name = "generate",
-      defaultPhase = LifecyclePhase.PROCESS_CLASSES)
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class JpaSchemaGeneratorMojo
         extends AbstractMojo {
 
@@ -418,6 +417,7 @@ public class JpaSchemaGeneratorMojo
     private String lineSeparator = System.getProperty("line.separator", "\n");
 
     private static final Map<String, String> LINE_SEPARATOR_MAP = new HashMap<>();
+
     static {
         LINE_SEPARATOR_MAP.put("CR", "\r");
         LINE_SEPARATOR_MAP.put("LF", "\n");
@@ -484,6 +484,7 @@ public class JpaSchemaGeneratorMojo
         return !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(this.scriptAction);
     }
 
+    @SuppressWarnings("deprecation")
     private void generate() throws Exception {
         Map<String, Object> map = new HashMap<>();
 
@@ -619,40 +620,33 @@ public class JpaSchemaGeneratorMojo
                 continue;
             }
             File tempFile = File.createTempFile("script", null, this.getOutputDirectory());
-            try {
-                // read/write with eol
-                BufferedReader reader = new BufferedReader(new FileReader(file));
-                PrintWriter writer = new PrintWriter(tempFile);
-                try {
-                    String line = null;
-                    while ((line = reader.readLine()) != null) {
-                        line = CREATE_DROP_PATTERN.matcher(line).replaceAll(";$1");
-                        for (String s : line.split(";")) {
-                            if (StringUtils.isBlank(s)) {
-                                continue;
-                            }
-                            s = s.trim();
-                            if (!s.endsWith(";")) {
-                                s += ";";
-                            }
-                            writer.print(this.isFormat() ? format(s) : s);
-                            writer.print(linesep);
+            // read/write with eol
+            try (BufferedReader reader = new BufferedReader(new FileReader(file));
+                 PrintWriter writer = new PrintWriter(tempFile)) {
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    line = CREATE_DROP_PATTERN.matcher(line).replaceAll(";$1");
+                    for (String s : line.split(";")) {
+                        if (StringUtils.isBlank(s)) {
+                            continue;
                         }
+                        s = s.trim();
+                        writer.print(this.isFormat() ? format(s) : s);
+                        writer.print(";");
+                        writer.print(linesep);
+                        writer.print(this.isFormat() ? linesep : "");
                     }
-                    writer.flush();
-                } finally {
-                    reader.close();
-                    writer.close();
                 }
+                writer.flush();
             } finally {
                 file.delete();
                 tempFile.renameTo(file);
             }
         }
+
     }
 
-    private static final Pattern
-            PATTERN_CREATE_TABLE = Pattern.compile("(?i)^create(\\s+\\S+)?\\s+(?:table|view)"),
+    private static final Pattern PATTERN_CREATE_TABLE = Pattern.compile("(?i)^create(\\s+\\S+)?\\s+(?:table|view)"),
             PATTERN_CREATE_INDEX = Pattern.compile("(?i)^create(\\s+\\S+)?\\s+index"),
             PATTERN_ALTER_TABLE = Pattern.compile("(?i)^alter\\s+table");
 
@@ -730,7 +724,7 @@ public class JpaSchemaGeneratorMojo
                 }
             }
         } else {
-            builder.append(s);
+            builder.append(s.trim()).append(linesep);
         }
         return builder.toString().trim();
     }
