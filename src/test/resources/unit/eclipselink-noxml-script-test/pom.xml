@@ -21,40 +21,39 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.github.divinespear</groupId>
-	<artifactId>hibernate-simple-script-test</artifactId>
+	<artifactId>eclipselink-simple-script-test</artifactId>
 	<version>0.0.0-TEST</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
-		<hibernate.version>5.0.7.Final</hibernate.version>
+		<eclipselink.version>2.6.1</eclipselink.version>
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate.version}</version>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.jpa</artifactId>
+			<version>${eclipselink.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
 		<outputDirectory>${basedir}/target/classes</outputDirectory>
 		<sourceDirectory>${basedir}/../src/java</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>${basedir}/resources</directory>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>io.github.divinespear</groupId>
 				<artifactId>jpa-schema-maven-plugin</artifactId>
 				<version>${plugin.version}</version>
 				<configuration>
-					<outputDirectory>${basedir}/target/test-classes/unit/hibernate-simple-script-test/target/generated-schema</outputDirectory>
+					<outputDirectory>${basedir}/target/test-classes/unit/eclipselink-simple-script-test/target/generated-schema</outputDirectory>
 					<scriptAction>drop-and-create</scriptAction>
 					<databaseProductName>H2</databaseProductName>
 					<databaseMajorVersion>1</databaseMajorVersion>
-					<databaseMinorVersion>3</databaseMinorVersion>
+					<databaseMinorVersion>4</databaseMinorVersion>
+					<vendor>eclipselink</vendor>
+					<packageToScan>
+						<string>io.github.divinespear</string>
+					</packageToScan>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -52,7 +52,6 @@
 				<configuration>
 					<outputDirectory>${basedir}/target/test-classes/unit/hibernate-formatted-script-test/target/generated-schema</outputDirectory>
 					<format>true</format>
-					<namingStrategy>org.hibernate.cfg.ImprovedNamingStrategy</namingStrategy>
 					<scriptAction>drop-and-create</scriptAction>
 					<databaseProductName>H2</databaseProductName>
 					<databaseMajorVersion>1</databaseMajorVersion>

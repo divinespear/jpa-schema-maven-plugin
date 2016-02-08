@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.persistence.Persistence;
+import javax.persistence.spi.PersistenceProvider;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.maven.artifact.Artifact;
@@ -126,7 +127,7 @@ public class JpaSchemaGeneratorMojo
     }
 
     /**
-     * location of <code>persistence.xml</code> file
+     * location of {@code persistence.xml} file
      * <p>
      * Note for Hibernate: <b>current version (4.3.1.Final) DOES NOT SUPPORT custom location.</b> ({@link SchemaExport}
      * support it, but JPA 2.1 schema generator does NOT.)
@@ -139,7 +140,7 @@ public class JpaSchemaGeneratorMojo
     }
 
     /**
-     * unit name of <code>persistence.xml</code>
+     * unit name of {@code persistence.xml}
      */
     @Parameter(required = true, defaultValue = "default")
     private String persistenceUnitName = "default";
@@ -151,10 +152,10 @@ public class JpaSchemaGeneratorMojo
     /**
      * schema generation action for database
      * <p>
-     * support value is <code>none</code>, <code>create</code>, <code>drop</code>, <code>drop-and-create</code>, or
-     * <code>create-or-extend-tables</code>.
+     * support value is {@code none}, {@code create}, {@code drop}, {@code drop-and-create}, or
+     * {@code create-or-extend-tables}.
      * <p>
-     * <code>create-or-extend-tables</code> only support for EclipseLink with database target.
+     * {@code create-or-extend-tables} only support for EclipseLink with database target.
      */
     @Parameter(required = true, defaultValue = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION)
     private String databaseAction = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION;
@@ -166,7 +167,7 @@ public class JpaSchemaGeneratorMojo
     /**
      * schema generation action for script
      * <p>
-     * support value is <code>none</code>, <code>create</code>, <code>drop</code>, or <code>drop-and-create</code>.
+     * support value is {@code none}, {@code create}, {@code drop}, or {@code drop-and-create}.
      */
     @Parameter(required = true, defaultValue = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION)
     private String scriptAction = PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION;
@@ -178,8 +179,8 @@ public class JpaSchemaGeneratorMojo
     /**
      * output directory for generated ddl scripts
      * <p>
-     * REQUIRED for {@link #scriptAction} is one of <code>create</code>, <code>drop</code>, or
-     * <code>drop-and-create</code>.
+     * REQUIRED for {@link #scriptAction} is one of {@code create}, {@code drop}, or
+     * {@code drop-and-create}.
      */
     @Parameter(defaultValue = "${project.build.directory}/generated-schema")
     private File outputDirectory;
@@ -191,7 +192,7 @@ public class JpaSchemaGeneratorMojo
     /**
      * generated create script name
      * <p>
-     * REQUIRED for {@link #scriptAction} is one of <code>create</code>, or <code>drop-and-create</code>.
+     * REQUIRED for {@link #scriptAction} is one of {@code create}, or {@code drop-and-create}.
      */
     @Parameter(defaultValue = "create.sql")
     private String createOutputFileName = "create.sql";
@@ -207,7 +208,7 @@ public class JpaSchemaGeneratorMojo
     /**
      * generated drop script name
      * <p>
-     * REQUIRED for {@link #scriptAction} is one of <code>drop</code>, or <code>drop-and-create</code>.
+     * REQUIRED for {@link #scriptAction} is one of {@code drop}, or {@code drop-and-create}.
      */
     @Parameter(defaultValue = "drop.sql")
     private String dropOutputFileName = "drop.sql";
@@ -224,8 +225,8 @@ public class JpaSchemaGeneratorMojo
      * specifies whether the creation of database artifacts is to occur on the basis of the object/relational mapping
      * metadata, DDL script, or a combination of the two.
      * <p>
-     * support value is <code>metadata</code>, <code>script</code>, <code>metadata-then-script</code>, or
-     * <code>script-then-metadata</code>.
+     * support value is {@code metadata}, {@code script}, {@code metadata-then-script}, or
+     * {@code script-then-metadata}.
      */
     @Parameter(defaultValue = PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE)
     private String createSourceMode = PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE;
@@ -237,8 +238,8 @@ public class JpaSchemaGeneratorMojo
     /**
      * create source file path.
      * <p>
-     * REQUIRED for {@link #createSourceMode} is one of <code>script</code>, <code>metadata-then-script</code>, or
-     * <code>script-then-metadata</code>.
+     * REQUIRED for {@link #createSourceMode} is one of {@code script}, {@code metadata-then-script}, or
+     * {@code script-then-metadata}.
      */
     @Parameter
     private File createSourceFile;
@@ -251,8 +252,8 @@ public class JpaSchemaGeneratorMojo
      * specifies whether the dropping of database artifacts is to occur on the basis of the object/relational mapping
      * metadata, DDL script, or a combination of the two.
      * <p>
-     * support value is <code>metadata</code>, <code>script</code>, <code>metadata-then-script</code>, or
-     * <code>script-then-metadata</code>.
+     * support value is {@code metadata}, {@code script}, {@code metadata-then-script}, or
+     * {@code script-then-metadata}.
      */
     @Parameter(defaultValue = PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE)
     private String dropSourceMode = PersistenceUnitProperties.SCHEMA_GENERATION_METADATA_SOURCE;
@@ -264,8 +265,8 @@ public class JpaSchemaGeneratorMojo
     /**
      * drop source file path.
      * <p>
-     * REQUIRED for {@link #dropSourceMode} is one of <code>script</code>, <code>metadata-then-script</code>, or
-     * <code>script-then-metadata</code>.
+     * REQUIRED for {@link #dropSourceMode} is one of {@code script}, {@code metadata-then-script}, or
+     * {@code script-then-metadata}.
      */
     @Parameter
     private File dropSourceFile;
@@ -376,41 +377,14 @@ public class JpaSchemaGeneratorMojo
     }
 
     /**
-     * naming strategy that implements {@link org.hibernate.cfg.NamingStrategy}
-     * <p>
-     * this is Hibernate-only option.
-     */
-    @Parameter
-    private String namingStrategy;
-
-    public String getNamingStrategy() {
-        return namingStrategy;
-    }
-
-    /**
-     * dialect class
-     * <p>
-     * use this parameter if you want use custom dialect class. default is detect from JDBC connection or using
-     * {@link #databaseProductName}, {@link #databaseMajorVersion}, and {@link #databaseMinorVersion}.
-     * <p>
-     * this is Hibernate-only option.
-     */
-    @Parameter
-    private String dialect;
-
-    public String getDialect() {
-        return dialect;
-    }
-
-    /**
      * line separator for generated schema file.
      * <p>
-     * support value is one of <code>CRLF</code> (windows default), <code>LF</code> (*nix, max osx), and <code>CR</code>
+     * support value is one of {@code CRLF} (windows default), {@code LF} (*nix, max osx), and {@code CR}
      * (classic mac), in case-insensitive.
      * <p>
-     * default value is system property <code>line.separator</code>. if JVM cannot detect <code>line.separator</code>,
-     * then use <code>LF</code> by <a href="http://git-scm.com/book/en/Customizing-Git-Git-Configuration">git
-     * <code>core.autocrlf</code> handling</a>.
+     * default value is system property {@code line.separator}. if JVM cannot detect {@code line.separator},
+     * then use {@code LF} by <a href="http://git-scm.com/book/en/Customizing-Git-Git-Configuration">git
+     * {@code core.autocrlf} handling</a>.
      */
     @Parameter
     private String lineSeparator = System.getProperty("line.separator", "\n");
@@ -426,6 +400,65 @@ public class JpaSchemaGeneratorMojo
     public String getLineSeparator() {
         String actual = StringUtils.isEmpty(lineSeparator) ? null : LINE_SEPARATOR_MAP.get(lineSeparator.toUpperCase());
         return actual == null ? System.getProperty("line.separator", "\n") : actual;
+    }
+
+    /**
+     * JPA vendor specific properties.
+     */
+    @Parameter
+    private Map<String, String> properties = new HashMap<>();
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public enum Vendor {
+        eclipselink,
+        hibernate,
+        datanucleus,
+    }
+
+    /**
+     * JPA vendor name or class name of vendor's {@link PersistenceProvider} implemention.
+     * <p>
+     * vendor name is one of
+     * <ul>
+     * <li>{@code eclipselink}</li>
+     * <li>{@code hibernate}</li>
+     * <li>{@code datanucleus}</li>
+     * </ul>
+     * <p>
+     * <b>REQUIRED for project without {@code persistence.xml}</b>
+     */
+    @Parameter
+    private Vendor vendor;
+
+    private static final Map<Vendor, Class<? extends PersistenceProvider>> PROVIDER_MAP = new HashMap<>();
+
+    static {
+        PROVIDER_MAP.put(Vendor.eclipselink, org.eclipse.persistence.jpa.PersistenceProvider.class);
+        PROVIDER_MAP.put(Vendor.hibernate, org.hibernate.jpa.HibernatePersistenceProvider.class);
+        PROVIDER_MAP.put(Vendor.datanucleus, org.datanucleus.api.jpa.PersistenceProviderImpl.class);
+    }
+
+    public Vendor getVendor() {
+        return vendor;
+    }
+
+    public Class<? extends PersistenceProvider> getProvider() {
+        return PROVIDER_MAP.get(vendor);
+    }
+
+    /**
+     * list of package name for scan entity classes
+     * <p>
+     * <b>REQUIRED for project without {@code persistence.xml}</b>
+     */
+    @Parameter
+    private List<String> packageToScan = new ArrayList<>();
+
+    public List<String> getPackageToScan() {
+        return packageToScan;
     }
 
     private static final URL[] EMPTY_URLS = new URL[0];
@@ -546,12 +579,11 @@ public class JpaSchemaGeneratorMojo
         /*
          * Hibernate specific
          */
-        // naming strategy
-        map.put(AvailableSettings.NAMING_STRATEGY, this.namingStrategy);
         // auto-detect
         map.put(AvailableSettings.AUTODETECTION, "class,hbm");
         // dialect (without jdbc connection)
-        if (this.dialect == null && this.jdbcUrl == null) {
+        String dialect = properties.get(org.hibernate.cfg.AvailableSettings.DIALECT);
+        if (StringUtils.isEmpty(dialect) && StringUtils.isEmpty(this.jdbcUrl)) {
             DialectResolutionInfo info = new DialectResolutionInfo() {
                 @Override
                 public String getDriverName() {
@@ -584,10 +616,11 @@ public class JpaSchemaGeneratorMojo
                 }
             };
             Dialect detectedDialect = StandardDialectResolver.INSTANCE.resolveDialect(info);
-            this.dialect = detectedDialect.getClass().getName();
+            dialect = detectedDialect.getClass().getName();
         }
-        if (this.dialect != null) {
-            map.put(org.hibernate.cfg.AvailableSettings.DIALECT, this.dialect);
+        if (dialect != null) {
+            properties.remove(org.hibernate.cfg.AvailableSettings.DIALECT);
+            map.put(org.hibernate.cfg.AvailableSettings.DIALECT, dialect);
         }
 
         if (!this.isDatabaseTarget() && StringUtils.isEmpty(this.jdbcUrl)) {
@@ -596,6 +629,8 @@ public class JpaSchemaGeneratorMojo
                                        this.getDatabaseMajorVersion(),
                                        this.getDatabaseMinorVersion()));
         }
+
+        map.putAll(properties);
 
         /* force override JTA to RESOURCE_LOCAL */
         map.put(PersistenceUnitProperties.TRANSACTION_TYPE, "RESOURCE_LOCAL");
