@@ -77,24 +77,23 @@ public class JpaSchemaGeneratorMojo
 
     private final Log log = this.getLog();
 
-    @Component
+    @Parameter(defaultValue = "${session}", readonly = true)
     private MavenSession session;
 
-    @Component
+    @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
 
-    @Component
+    @Parameter(defaultValue = "${mojoExecution}", readonly = true)
     private MojoExecution mojo;
+
+    @Parameter(defaultValue = "${plugin}", readonly = true)
+    private PluginDescriptor plugin;
+
+    @Parameter(defaultValue = "${settings}", readonly = true)
+    private Settings settings;
 
     @Component
     private ArtifactResolver resolver;
-
-    // for Maven 3 only
-    @Component
-    private PluginDescriptor plugin;
-
-    @Component
-    private Settings settings;
 
     /**
      * skip schema generation
