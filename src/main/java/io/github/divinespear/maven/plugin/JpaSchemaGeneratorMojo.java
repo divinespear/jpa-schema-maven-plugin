@@ -630,7 +630,7 @@ public class JpaSchemaGeneratorMojo
                             continue;
                         }
                         s = s.trim();
-                        writer.print(this.isFormat() ? format(s) : s);
+                        writer.print((this.isFormat() ? format(s) : s).replaceAll("\r\n", linesep));
                         writer.print(";");
                         writer.print(linesep);
                         writer.print(this.isFormat() ? linesep : "");

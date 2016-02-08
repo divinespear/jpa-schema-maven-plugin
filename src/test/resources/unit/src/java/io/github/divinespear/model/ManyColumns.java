@@ -38,7 +38,7 @@ import javax.persistence.Table;
 public class ManyColumns {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue
     private Long id;
 
     private String column00;
