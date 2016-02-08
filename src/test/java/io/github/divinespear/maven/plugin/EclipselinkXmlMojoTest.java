@@ -34,7 +34,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class BasicEclipseLinkMojoTest
+public class EclipselinkXmlMojoTest
         extends AbstractSchemaGeneratorMojoTest {
 
     @Before
