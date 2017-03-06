@@ -14,7 +14,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.divinespear</groupId>
 	<artifactId>jpa-schema-maven-plugin</artifactId>
-	<version>0.2.1</version>
+	<version>0.2.2-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<parent>
