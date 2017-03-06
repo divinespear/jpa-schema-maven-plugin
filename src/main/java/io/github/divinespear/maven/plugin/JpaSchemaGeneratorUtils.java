@@ -8,10 +8,10 @@ import java.util.Map;
 import org.apache.commons.lang.NullArgumentException;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
 import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
-import org.hibernate.jpa.AvailableSettings;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -45,7 +45,6 @@ final class JpaSchemaGeneratorUtils {
         return !PersistenceUnitProperties.SCHEMA_GENERATION_NONE_ACTION.equalsIgnoreCase(mojo.getScriptAction());
     }
 
-    @SuppressWarnings("deprecation")
     public static Map<String, Object> buildProperties(JpaSchemaGeneratorMojo mojo) {
         Map<String, Object> map = new HashMap<>();
         Map<String, String> properties = mojo.getProperties();
@@ -111,9 +110,9 @@ final class JpaSchemaGeneratorUtils {
          * Hibernate specific
          */
         // auto-detect
-        map.put(AvailableSettings.AUTODETECTION, "class,hbm");
+        map.put(AvailableSettings.SCANNER_DISCOVERY, "class,hbm");
         // dialect (without jdbc connection)
-        String dialect = properties.get(org.hibernate.cfg.AvailableSettings.DIALECT);
+        String dialect = properties.get(AvailableSettings.DIALECT);
         if (StringUtils.isEmpty(dialect) && StringUtils.isEmpty(mojo.getJdbcUrl())) {
             final String productName = mojo.getDatabaseProductName();
             final int minorVersion = mojo.getDatabaseMinorVersion() == null ? 0 : mojo.getDatabaseMinorVersion();
@@ -153,12 +152,12 @@ final class JpaSchemaGeneratorUtils {
             dialect = detectedDialect.getClass().getName();
         }
         if (dialect != null) {
-            properties.remove(org.hibernate.cfg.AvailableSettings.DIALECT);
-            map.put(org.hibernate.cfg.AvailableSettings.DIALECT, dialect);
+            properties.remove(AvailableSettings.DIALECT);
+            map.put(AvailableSettings.DIALECT, dialect);
         }
 
         if (!isDatabaseTarget(mojo) && StringUtils.isEmpty(mojo.getJdbcUrl())) {
-            map.put(AvailableSettings.SCHEMA_GEN_CONNECTION,
+            map.put(org.hibernate.jpa.AvailableSettings.SCHEMA_GEN_CONNECTION,
                     new ConnectionMock(mojo.getDatabaseProductName(),
                                        mojo.getDatabaseMajorVersion(),
                                        mojo.getDatabaseMinorVersion()));
