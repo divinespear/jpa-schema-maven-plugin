@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -46,20 +44,17 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Settings;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
@@ -83,17 +78,8 @@ public class JpaSchemaGeneratorMojo
     @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
 
-    @Parameter(defaultValue = "${mojoExecution}", readonly = true)
-    private MojoExecution mojo;
-
-    @Parameter(defaultValue = "${plugin}", readonly = true)
-    private PluginDescriptor plugin;
-
-    @Parameter(defaultValue = "${settings}", readonly = true)
-    private Settings settings;
-
     @Component
-    private ArtifactResolver resolver;
+    private RepositorySystem repositorySystem;
 
     /**
      * skip schema generation
@@ -485,10 +471,10 @@ public class JpaSchemaGeneratorMojo
             for (Artifact artifact : artifacts) {
                 if (!Artifact.SCOPE_TEST.equalsIgnoreCase(artifact.getScope())) {
                     ArtifactResolutionRequest request = new ArtifactResolutionRequest(sharedreq).setArtifact(artifact);
-                    ArtifactResolutionResult result = this.resolver.resolve(request);
+                    ArtifactResolutionResult result = this.repositorySystem.resolve(request);
                     if (result.isSuccess()) {
                         File file = repository.find(artifact).getFile();
-                        if (file != null) {
+                        if (file != null && file.isFile() && file.canRead()) {
                             classURLs.add(file.toURI().toURL());
                         }
                     }
@@ -527,41 +513,40 @@ public class JpaSchemaGeneratorMojo
             info.setPersistenceProviderPackageName(provider.getClass().getName());
             info.getProperties().putAll(map);
 
-            Path persistenceXml = null;
+            // Path persistenceXml = null;
             /* @formatter:off */
-            /*
-            if (Vendor.datanucleus.equals(getVendor())) {
-                // datanucleus must need persistence.xml
-                Path path = Paths.get(project.getBuild().getOutputDirectory(), "META-INF");
-                persistenceXml = Files.createTempFile(path, "persistence-", ".xml");
-                try (BufferedWriter writer = Files.newBufferedWriter(persistenceXml, StandardCharsets.UTF_8)) {
-                    PrintWriter out = new PrintWriter(writer);
-                    out.println("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
-                    out.println("<persistence version=\"2.1\"");
-                    out.println("    xmlns=\"http://xmlns.jcp.org/xml/ns/persistence\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
-                    out.println("    xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/persistence http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/persistence/persistence_2_1.xsd\">");
-                    out.printf("    <persistence-unit name=\"%s\" transaction-type=\"RESOURCE_LOCAL\">\n",
-                               info.getPersistenceUnitName());
-                    out.println("        <provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>");
-                    out.println("        <exclude-unlisted-classes>false</exclude-unlisted-classes>");
-                    out.println("    </persistence-unit>");
-                    out.println("</persistence>");
-                }
-                map.put(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME, persistenceXml.toAbsolutePath().toString());
-
-                // datanucleus does not support execution order...
-                map.remove(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SOURCE);
-                map.remove(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SOURCE);
-            }
-            */
+            // if (Vendor.datanucleus.equals(getVendor())) {
+            // // datanucleus must need persistence.xml
+            // Path path = Paths.get(project.getBuild().getOutputDirectory(), "META-INF");
+            // persistenceXml = Files.createTempFile(path, "persistence-", ".xml");
+            // try (BufferedWriter writer = Files.newBufferedWriter(persistenceXml, StandardCharsets.UTF_8)) {
+            // PrintWriter out = new PrintWriter(writer);
+            // out.println("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
+            // out.println("<persistence version=\"2.1\"");
+            // out.println(" xmlns=\"http://xmlns.jcp.org/xml/ns/persistence\"
+            // xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+            // out.println(" xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/persistence
+            // http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/persistence/persistence_2_1.xsd\">");
+            // out.printf(" <persistence-unit name=\"%s\" transaction-type=\"RESOURCE_LOCAL\">\n",
+            // info.getPersistenceUnitName());
+            // out.println(" <provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>");
+            // out.println(" <exclude-unlisted-classes>false</exclude-unlisted-classes>");
+            // out.println(" </persistence-unit>");
+            // out.println("</persistence>");
+            // }
+            // map.put(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME, persistenceXml.toAbsolutePath().toString());
+            // // datanucleus does not support execution order...
+            // map.remove(PersistenceUnitProperties.SCHEMA_GENERATION_CREATE_SOURCE);
+            // map.remove(PersistenceUnitProperties.SCHEMA_GENERATION_DROP_SOURCE);
+            // }
             /* @formatter:on */
 
             try {
                 provider.generateSchema(info, map);
             } finally {
-                if (persistenceXml != null) {
-                    Files.delete(persistenceXml);
-                }
+                // if (persistenceXml != null) {
+                // Files.delete(persistenceXml);
+                // }
             }
         }
     }
