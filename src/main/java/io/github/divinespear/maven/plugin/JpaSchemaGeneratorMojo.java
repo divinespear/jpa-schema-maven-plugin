@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.DatabaseMetaData;
@@ -417,20 +418,26 @@ public class JpaSchemaGeneratorMojo
     @Parameter
     private Vendor vendor;
 
-    private static final Map<Vendor, Class<? extends PersistenceProvider>> PROVIDER_MAP = new HashMap<>();
+    private static final Map<Vendor, String> PROVIDER_MAP = new HashMap<>();
 
     static {
-        PROVIDER_MAP.put(Vendor.eclipselink, org.eclipse.persistence.jpa.PersistenceProvider.class);
-        PROVIDER_MAP.put(Vendor.hibernate, org.hibernate.jpa.HibernatePersistenceProvider.class);
-        // PROVIDER_MAP.put(Vendor.datanucleus, org.datanucleus.api.jpa.PersistenceProviderImpl.class);
+        PROVIDER_MAP.put(Vendor.eclipselink, "org.eclipse.persistence.jpa.PersistenceProvider");
+        PROVIDER_MAP.put(Vendor.hibernate, "org.hibernate.jpa.HibernatePersistenceProvider");
+        // PROVIDER_MAP.put(Vendor.datanucleus, "org.datanucleus.api.jpa.PersistenceProviderImpl");
     }
 
     public Vendor getVendor() {
         return vendor;
     }
 
+    @SuppressWarnings("unchecked")
     public Class<? extends PersistenceProvider> getProviderClass() {
-        return PROVIDER_MAP.get(vendor);
+        String vendorClassName = PROVIDER_MAP.get(vendor);
+        try {
+            return (Class<PersistenceProvider>) Class.forName(vendorClassName);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("vendor class " + vendorClassName, e);
+        }
     }
 
     /**
@@ -507,6 +514,10 @@ public class JpaSchemaGeneratorMojo
             DefaultPersistenceUnitManager manager = new DefaultPersistenceUnitManager();
             manager.setDefaultPersistenceUnitName(getPersistenceUnitName());
             manager.setPackagesToScan(packages.toArray(new String[packages.size()]));
+            // issue #22
+            Field persistenceXmlLocations = manager.getClass().getDeclaredField("persistenceXmlLocations");
+            persistenceXmlLocations.setAccessible(true);
+            persistenceXmlLocations.set(manager, new String[0]);
             manager.afterPropertiesSet();
 
             SmartPersistenceUnitInfo info = (SmartPersistenceUnitInfo) manager.obtainDefaultPersistenceUnitInfo();
