@@ -72,7 +72,7 @@
 		<eclipselink.version>2.6.1</eclipselink.version>
 		<hibernate.version>5.0.7.Final</hibernate.version>
 		<datanucleus.version>4.2.3</datanucleus.version>
-		<spring-data-jpa.version>1.9.2.RELEASE</spring-data-jpa.version>
+		<spring-data-jpa.version>1.11.23.RELEASE</spring-data-jpa.version>
 	</properties>
 
 	<dependencies>
