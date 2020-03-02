@@ -2,10 +2,12 @@ sudo: false
 
 language: java
 jdk:
-  - oraclejdk7
-  - oraclejdk8
+  - openjdk8
 
-after_success: mvn deploy --settings src/travis-ci/settings.xml
+script:
+  - ./mvnw test -B
+after_success:
+  - ./mvnw deploy --settings src/travis-ci/settings.xml
 
 branches:
   only:
