@@ -1,6 +1,7 @@
 # jpa-schema-maven-plugin
 
 [![Build Status](https://secure.travis-ci.org/divinespear/jpa-schema-maven-plugin.png)](http://travis-ci.org/divinespear/jpa-schema-maven-plugin)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdivinespear%2Fjpa-schema-maven-plugin.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdivinespear%2Fjpa-schema-maven-plugin?ref=badge_shield)
 
 Maven plugin for generate schema or DDL scripts from JPA entities using [JPA 2.1](http://jcp.org/en/jsr/detail?id=338) schema generator.
 for Gradle, see [Gradle Plugin](https://github.com/divinespear/jpa-schema-gradle-plugin).
@@ -161,3 +162,6 @@ You can override using `hibernate.dialect` property.
 ## License
 
 Source Copyright © 2013 Sin-young "Divinespear" Kang. Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses).
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdivinespear%2Fjpa-schema-maven-plugin.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdivinespear%2Fjpa-schema-maven-plugin?ref=badge_large)
