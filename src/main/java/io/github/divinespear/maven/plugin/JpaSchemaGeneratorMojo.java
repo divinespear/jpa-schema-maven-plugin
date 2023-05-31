@@ -501,7 +501,7 @@ public class JpaSchemaGeneratorMojo
 
     private void generate() throws Exception {
         Map<String, Object> map = JpaSchemaGeneratorUtils.buildProperties(this);
-        if (getVendor() == null) {
+        if (getVendor() != null) {
             // with persistence.xml
             Persistence.generateSchema(this.persistenceUnitName, map);
         } else {
