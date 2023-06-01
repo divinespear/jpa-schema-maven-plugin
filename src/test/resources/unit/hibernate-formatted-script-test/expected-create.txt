@@ -1,8 +1,8 @@
-create sequence hibernate_sequence start with 1 increment by 1;
+create sequence MANY_COLUMN_TABLE_SEQ start with 1 increment by 50;
 
 create table KEY_VALUE_STORE (
 	STORED_KEY varchar(128) not null,
-	CREATED_AT timestamp,
+	CREATED_AT timestamp(6),
 	STORED_VALUE varchar(32768),
 	primary key (STORED_KEY)
 );

@@ -2,5 +2,5 @@ drop table KEY_VALUE_STORE if exists;
 
 drop table MANY_COLUMN_TABLE if exists;
 
-drop sequence if exists hibernate_sequence;
+drop sequence if exists MANY_COLUMN_TABLE_SEQ;
 

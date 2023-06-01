@@ -25,9 +25,9 @@
 	<version>0.0.0-TEST</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
-		<eclipselink.version>2.6.1</eclipselink.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+		<eclipselink.version>3.0.3</eclipselink.version>
 	</properties>
 	<dependencies>
 		<dependency>

@@ -13,6 +13,8 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
 import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
 
+import static org.hibernate.cfg.AvailableSettings.JAKARTA_HBM2DDL_CONNECTION;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -129,6 +131,11 @@ final class JpaSchemaGeneratorUtils {
                 }
 
                 @Override
+                public String getSQLKeywords() {
+                    return "ABORT,DECIMAL,INTERVAL,PRESERVE,ALL,DECODE,INTO,PRIMARY,ALLOCATE,DEFAULT,LEADING,RESET,ANALYSE,DESC,LEFT,REUSE,ANALYZE,DISTINCT,LIKE,RIGHT,AND,DISTRIBUTE,LIMIT,ROWS,ANY,DO,LOAD,SELECT,AS,ELSE,LOCAL,SESSION_USER,ASC,END,LOCK,SETOF,BETWEEN,EXCEPT,MINUS,SHOW,BINARY,EXCLUDE,MOVE,SOME,BIT,EXISTS,NATURAL,TABLE,BOTH,EXPLAIN,NCHAR,THEN,CASE,EXPRESS,NEW,TIES,CAST,EXTEND,NOT,TIME,CHAR,EXTERNAL,NOTNULL,TIMESTAMP,CHARACTER,EXTRACT,NULL,TO,CHECK,FALSE,NULLS,TRAILING,CLUSTER,FIRST,NUMERIC,TRANSACTION,COALESCE,FLOAT,NVL,TRIGGER,COLLATE,FOLLOWING,NVL2,TRIM,COLLATION,FOR,OFF,TRUE,COLUMN,FOREIGN,OFFSET,UNBOUNDED,CONSTRAINT,FROM,OLD,UNION,COPY,FULL,ON,UNIQUE,CROSS,FUNCTION,ONLINE,USER,CURRENT,GENSTATS,ONLY,USING,CURRENT_CATALOG,GLOBAL,OR,VACUUM,CURRENT_DATE,GROUP,ORDER,VARCHAR,CURRENT_DB,HAVING,OTHERS,VERBOSE,CURRENT_SCHEMA,IDENTIFIER_CASE,OUT,VERSION,CURRENT_SID,ILIKE,OUTER,VIEW,CURRENT_TIME,IN,OVER,WHEN,CURRENT_TIMESTAMP,INDEX,OVERLAPS,WHERE,CURRENT_USER,INITIALLY,PARTITION,WITH,CURRENT_USERID,INNER,POSITION,WRITE,CURRENT_USEROID,INOUT,PRECEDING,RESET,DEALLOCATE,INTERSECT,PRECISION,REUSE,DEC";
+                }
+
+                @Override
                 public int getDriverMajorVersion() {
                     return 0;
                 }
@@ -136,6 +143,11 @@ final class JpaSchemaGeneratorUtils {
                 @Override
                 public String getDatabaseName() {
                     return productName;
+                }
+
+                @Override
+                public String getDatabaseVersion() {
+                    return String.format("%d.%d", getDatabaseMajorVersion(), getDatabaseMinorVersion());
                 }
 
                 @Override
@@ -148,7 +160,7 @@ final class JpaSchemaGeneratorUtils {
                     return majorVersion;
                 }
             };
-            Dialect detectedDialect = StandardDialectResolver.INSTANCE.resolveDialect(info);
+            Dialect detectedDialect = new StandardDialectResolver().resolveDialect(info);
             dialect = detectedDialect.getClass().getName();
         }
         if (dialect != null) {
@@ -157,7 +169,7 @@ final class JpaSchemaGeneratorUtils {
         }
 
         if (!isDatabaseTarget(mojo) && StringUtils.isEmpty(mojo.getJdbcUrl())) {
-            map.put(org.hibernate.jpa.AvailableSettings.SCHEMA_GEN_CONNECTION,
+            map.put(JAKARTA_HBM2DDL_CONNECTION,
                     new ConnectionMock(mojo.getDatabaseProductName(),
                                        mojo.getDatabaseMajorVersion(),
                                        mojo.getDatabaseMinorVersion()));
