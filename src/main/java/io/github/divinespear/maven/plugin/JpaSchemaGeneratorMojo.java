@@ -19,6 +19,8 @@
 
 package io.github.divinespear.maven.plugin;
 
+import jakarta.persistence.Persistence;
+import jakarta.persistence.spi.PersistenceProvider;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -27,6 +29,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -37,9 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import javax.persistence.Persistence;
-import javax.persistence.spi.PersistenceProvider;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -58,7 +58,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
-import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager;
 import org.springframework.orm.jpa.persistenceunit.SmartPersistenceUnitInfo;
 
@@ -500,6 +499,11 @@ public class JpaSchemaGeneratorMojo
     }
 
     private void generate() throws Exception {
+        if (getOutputDirectory() != null) {
+            Files.deleteIfExists(getCreateOutputFile().toPath());
+            Files.deleteIfExists(getDropOutputFile().toPath());
+        }
+
         Map<String, Object> map = JpaSchemaGeneratorUtils.buildProperties(this);
         if (getVendor() == null) {
             // with persistence.xml
@@ -586,7 +590,7 @@ public class JpaSchemaGeneratorMojo
                             continue;
                         }
                         s = s.trim();
-                        writer.print((this.isFormat() ? format(s) : s).replaceAll("\r\n", linesep));
+                        writer.print((this.isFormat() ? format(s) : s).replaceAll("\r?\n", linesep));
                         writer.print(";");
                         writer.print(linesep);
                         writer.print(this.isFormat() ? linesep : "");
